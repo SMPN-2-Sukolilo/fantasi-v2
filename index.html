@@ -1,0 +1,4094 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TREASURE ESCAPE: THE CURSE OF THE ELDER LICH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark-blue: #0b1021;
+      --bg-charcoal: #181c2e;
+      --accent-purple: #4c1d95;
+      --accent-purple-glow: #8b5cf6;
+      --accent-green: #14362b;
+      --accent-gold: #fbbf24;
+      --accent-gold-dark: #b45309;
+      --accent-ice: #38bdf8;
+      --danger: #ef4444;
+      --success: #10b981;
+      --text-light: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark-blue);
+      color: var(--text-light);
+      font-family: 'Inter', sans-serif;
+    }
+
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at center, #181c2e 0%, #0b1021 100%);
+    }
+
+    /* Pixel Art & Fantasy Typography */
+    .font-pixel {
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    .font-fantasy {
+      font-family: 'Cinzel', serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b1021;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4c1d95;
+      border-radius: 3px;
+    }
+
+    /* Screens */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 16px;
+      background: radial-gradient(ellipse at center, rgba(24, 28, 46, 0.92) 0%, rgba(11, 16, 33, 0.98) 100%);
+      overflow-y: auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Main Menu Styling */
+    .menu-card {
+      background: linear-gradient(145deg, rgba(24, 28, 46, 0.95), rgba(11, 16, 33, 0.98));
+      border: 2px solid var(--accent-gold);
+      box-shadow: 0 0 40px rgba(76, 29, 149, 0.6), inset 0 0 20px rgba(251, 191, 36, 0.1);
+      border-radius: 16px;
+      padding: 24px 28px;
+      max-width: 640px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+
+    .game-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: clamp(1.7rem, 5vw, 2.8rem);
+      color: var(--accent-gold);
+      text-shadow: 0 4px 0 #78350f, 0 0 20px rgba(251, 191, 36, 0.5);
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .game-subtitle {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.65rem, 2vw, 0.85rem);
+      color: #c4b5fd;
+      margin-top: 8px;
+      text-shadow: 0 2px 4px #000;
+      line-height: 1.5;
+    }
+
+    .level-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: rgba(76, 29, 149, 0.55);
+      border: 1px solid #8b5cf6;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #e9d5ff;
+    }
+
+    #showcaseCanvas {
+      width: 100%;
+      max-width: 440px;
+      height: 110px;
+      margin: 14px auto;
+      background: linear-gradient(180deg, #0f172a 0%, #14362b 100%);
+      border: 2px solid #334155;
+      border-radius: 12px;
+      image-rendering: pixelated;
+    }
+
+    .input-group {
+      margin: 12px auto 16px;
+      max-width: 340px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--accent-gold);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 2px solid #4c1d95;
+      background: #0b1021;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+    }
+
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: transform 0.12s, box-shadow 0.15s, filter 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+      color: #181c2e;
+      box-shadow: 0 4px 0 #78350f, 0 8px 20px rgba(251, 191, 36, 0.35);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.8rem;
+      padding: 16px 18px;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+      color: #f3e8ff;
+      border: 1px solid #7c3aed;
+      box-shadow: 0 4px 0 #1e1b4b;
+      font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(1.15);
+    }
+
+    /* Game Screen & HUD */
+    #gameContainer {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #hud {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 8px 12px;
+      background: linear-gradient(180deg, rgba(11, 16, 33, 0.96) 0%, rgba(24, 28, 46, 0.92) 100%);
+      border-bottom: 2px solid #334155;
+      z-index: 10;
+      font-size: 0.8rem;
+    }
+
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hud-pill {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .hud-pill.gold {
+      border-color: rgba(251, 191, 36, 0.5);
+      color: var(--accent-gold);
+    }
+
+    .hud-pill.ice {
+      border-color: rgba(56, 189, 248, 0.5);
+      color: var(--accent-ice);
+    }
+
+    .hud-pill.purple {
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #c4b5fd;
+    }
+
+    .hearts-wrap {
+      display: flex;
+      gap: 3px;
+      font-size: 1rem;
+    }
+
+    .heart-lost {
+      opacity: 0.25;
+      filter: grayscale(1);
+    }
+
+    @keyframes heartShake {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.35) rotate(-10deg); }
+      75% { transform: scale(1.35) rotate(10deg); }
+    }
+    .heart-damage {
+      animation: heartShake 0.4s ease;
+    }
+
+    #statusBar {
+      position: absolute;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 9;
+      pointer-events: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 95%;
+    }
+
+    .buff-badge {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      animation: pulseBuff 1s infinite alternate;
+    }
+
+    .buff-immunity {
+      background: linear-gradient(90deg, #b45309, #fbbf24);
+      color: #0b1021;
+      border: 2px solid #fff;
+    }
+
+    .buff-stun {
+      background: linear-gradient(90deg, #0369a1, #38bdf8);
+      color: #0b1021;
+      border: 2px solid #e0f2fe;
+    }
+
+    .buff-objective {
+      background: rgba(20, 54, 43, 0.92);
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+      animation: none;
+    }
+
+    @keyframes pulseBuff {
+      from { transform: scale(0.98); }
+      to { transform: scale(1.03); }
+    }
+
+    #canvasWrapper {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+      background: #070a14;
+    }
+
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    /* Touch Controls */
+    #touchControls {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    #joystickZone {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      width: 124px;
+      height: 124px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.45);
+      border: 2px solid rgba(251, 191, 36, 0.4);
+      pointer-events: auto;
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #joystickKnob {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fbbf24 0%, #b45309 100%);
+      border: 2px solid #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+      transform: translate(0px, 0px);
+      transition: transform 0.04s linear;
+    }
+
+    .action-buttons {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      pointer-events: auto;
+    }
+
+    .touch-btn {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      font-weight: 800;
+      font-size: 0.68rem;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.65);
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+
+    .touch-btn:active {
+      transform: scale(0.92);
+    }
+
+    .touch-interact {
+      background: radial-gradient(circle, #fbbf24 0%, #b45309 100%);
+      color: #0b1021;
+    }
+
+    .touch-ability {
+      background: radial-gradient(circle, #38bdf8 0%, #0369a1 100%);
+      color: #0b1021;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 10, 20, 0.72);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: linear-gradient(160deg, #181c2e 0%, #0b1021 100%);
+      border: 2px solid var(--accent-gold);
+      border-radius: 16px;
+      padding: 20px 22px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.85), 0 0 24px rgba(76, 29, 149, 0.6);
+      position: relative;
+    }
+
+    @keyframes modalShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: modalShake 0.4s ease;
+    }
+
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .tag-cat {
+      background: rgba(76, 29, 149, 0.6);
+      color: #e9d5ff;
+      border: 1px solid #8b5cf6;
+    }
+
+    .tag-EASY { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
+    .tag-MEDIUM { background: #78350f; color: #fde68a; border: 1px solid #f59e0b; }
+    .tag-HARD { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+
+    .quiz-warning {
+      font-size: 0.74rem;
+      color: #fca5a5;
+      background: rgba(127, 29, 29, 0.35);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .quiz-question {
+      font-size: 1rem;
+      line-height: 1.5;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 16px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      text-align: left;
+      background: #1e293b;
+      border: 2px solid #334155;
+      color: #f1f5f9;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent-gold);
+      background: #273549;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background: rgba(6, 78, 59, 0.9);
+      border-color: #10b981;
+      color: #ecfdf5;
+    }
+
+    .option-btn.wrong {
+      background: rgba(127, 29, 29, 0.85);
+      border-color: #ef4444;
+      color: #fef2f2;
+    }
+
+    .option-letter {
+      font-weight: 800;
+      color: var(--accent-gold);
+      min-width: 22px;
+    }
+
+    .feedback-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .feedback-correct {
+      background: rgba(6, 78, 59, 0.75);
+      border: 1px solid #10b981;
+      color: #d1fae5;
+    }
+
+    .feedback-wrong {
+      background: rgba(127, 29, 29, 0.75);
+      border: 1px solid #ef4444;
+      color: #fee2e2;
+    }
+
+    /* Gacha Animation Overlay */
+    .gacha-chest-art {
+      font-size: 4rem;
+      margin: 16px 0;
+      display: inline-block;
+      animation: chestBounce 0.45s infinite alternate;
+    }
+
+    @keyframes chestBounce {
+      from { transform: scale(0.92) rotate(-5deg); }
+      to { transform: scale(1.12) rotate(5deg); }
+    }
+
+    /* Summary Grid for Victory / Game Over */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+      text-align: left;
+    }
+
+    .stat-item {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      padding: 10px 12px;
+      border-radius: 10px;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: 2px;
+    }
+
+    /* Toast Notification */
+    #toastBanner {
+      position: absolute;
+      top: 96px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11, 16, 33, 0.95);
+      border: 2px solid var(--accent-gold);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      z-index: 25;
+      pointer-events: none;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.75);
+      transition: opacity 0.25s;
+    }
+
+    @media (min-width: 900px) {
+      /* On larger desktop screens, make touch controls subtle or hide until touch is used */
+      body.desktop-mode #touchControls {
+        opacity: 0.35;
+      }
+      body.desktop-mode #touchControls:hover {
+        opacity: 0.9;
+      }
+    }
+  </style>
+</head>
+<body class="desktop-mode">
+  <div id="app">
+    <!-- ==================== MAIN MENU ==================== -->
+    <section id="mainMenu" class="screen">
+      <div class="menu-card">
+        <div class="game-title">TREASURE ESCAPE</div>
+        <div class="game-subtitle">THE CURSE OF THE ELDER LICH</div>
+        <div class="level-badge">⚔️ PETUALANGAN SURVIVAL 2 LEVEL • INFORMATIKA SMP</div>
+
+        <canvas id="showcaseCanvas" width="440" height="110"></canvas>
+
+        <div class="input-group">
+          <label for="playerNameInput">NAMA PETUALANG (OPSIONAL)</label>
+          <input type="text" id="playerNameInput" maxlength="20" placeholder="Contoh: Arya / Petualang" />
+        </div>
+
+        <div class="btn-stack">
+          <button id="btnStartAdventure" class="btn btn-primary">▶ START ADVENTURE</button>
+          <div class="btn-row">
+            <button id="btnHowToPlay" class="btn btn-secondary">📜 HOW TO PLAY</button>
+            <button id="btnSoundToggleMenu" class="btn btn-secondary">🔊 SOUND: ON</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== GAMEPLAY SCREEN ==================== -->
+    <section id="gameContainer" class="hidden">
+      <!-- Top HUD -->
+      <header id="hud">
+        <div class="hud-group">
+          <div class="hud-pill gold">⏱️ <span id="hudTimer">00:00</span></div>
+          <div class="hud-pill purple">🏰 <span id="hudLevel">LEVEL 1</span></div>
+          <div class="hud-pill" title="Nyawa Petualang">
+            <div id="hudHearts" class="hearts-wrap">❤️❤️❤️</div>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <div class="hud-pill">✅ Soal: <span id="hudCorrect">0</span></div>
+          <div class="hud-pill gold">📦 Peti: <span id="hudChests">0/5</span></div>
+          <div class="hud-pill ice">❄️ Freeze: <span id="hudAbility">0</span></div>
+          <button id="btnSoundToggleHud" class="hud-pill" style="cursor:pointer;" title="Suara">🔊</button>
+        </div>
+      </header>
+
+      <!-- Active Buffs & Objective Indicator -->
+      <div id="statusBar">
+        <div id="hudObjective" class="buff-badge buff-objective">🎯 Buka 5 Peti Harta Karun!</div>
+        <div id="hudImmunityBadge" class="buff-badge buff-immunity hidden">🛡️ DIVINE IMMUNITY: <span id="hudImmunityTime">8.0</span>s</div>
+        <div id="hudStunBadge" class="buff-badge buff-stun hidden">❄️ MONSTER STUNNED: <span id="hudStunTime">5.0</span>s</div>
+      </div>
+
+      <div id="toastBanner" class="hidden">Pesan Notifikasi</div>
+
+      <!-- Canvas Area -->
+      <div id="canvasWrapper">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Responsive Touch Controls -->
+        <div id="touchControls">
+          <div id="joystickZone">
+            <div id="joystickKnob"></div>
+          </div>
+          <div class="action-buttons">
+            <button id="btnTouchInteract" class="touch-btn touch-interact">
+              <span style="font-size:1.25rem;">📦</span>
+              <span>INTERACT</span>
+            </button>
+            <button id="btnTouchAbility" class="touch-btn touch-ability">
+              <span style="font-size:1.25rem;">❄️</span>
+              <span>ABILITY</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== HOW TO PLAY MODAL ==================== -->
+    <div id="howToPlayModal" class="modal-backdrop hidden">
+      <div class="modal-box">
+        <h2 class="font-fantasy" style="color:var(--accent-gold); margin-bottom:12px; font-size:1.4rem;">📜 PANDUAN PETUALANG</h2>
+        <div style="font-size:0.86rem; line-height:1.55; color:#e2e8f0; display:flex; flex-direction:column; gap:10px;">
+          <p><strong>🎯 Misi Utama:</strong> Jelajahi kastil terkutuk melewati <strong>2 Level</strong> untuk mematahkan kutukan <em>Elder Lich</em> dengan menjawab soal-soal Informatika SMP.</p>
+          <p><strong>🎮 Kontrol Permainan:</strong><br>
+          • <strong>Desktop:</strong> <code>W A S D</code> / <code>Panah</code> untuk bergerak, <code>E</code> untuk membuka peti, <code>SPACE</code> untuk mengaktifkan <em>Ancient Freeze</em>.<br>
+          • <strong>Mobile/Tablet:</strong> Gunakan <em>Virtual Joystick</em> di kiri bawah serta tombol <strong>INTERACT</strong> & <strong>ABILITY</strong> di kanan.</p>
+          <p><strong>❄️ Milestone Ability (Ancient Freeze):</strong><br>
+          • 2 jawaban benar = mendapat 1 Ancient Freeze.<br>
+          • Setiap jawaban benar berikutnya (+1 setiap soal) menambah stok ability.<br>
+          • Membekukan <em>Skeleton</em> & <em>Dead Knight</em> selama <strong>5 detik</strong>, serta <em>Elder Lich</em> selama <strong>3 detik</strong>!</p>
+          <p><strong>🎲 Cursed Chest (Gacha Level 1):</strong> Satu peti di Level 1 adalah peti terkutuk! Setelah dijawab benar, kamu berpeluang <strong>60%</strong> mendapat <em>Divine Immunity</em> (kebal 8 detik) atau <strong>40%</strong> memanggil <em>Dead Knight</em>!</p>
+          <p><strong>⚠️ Waspada:</strong> Monster tetap bergerak mengejarmu saat kamu membaca soal, kecuali mereka sedang membeku!</p>
+        </div>
+        <button id="btnCloseHowToPlay" class="btn btn-primary" style="margin-top:16px;">MENGERTI, AYO MULAI!</button>
+      </div>
+    </div>
+
+    <!-- ==================== QUIZ MODAL ==================== -->
+    <div id="quizModal" class="modal-backdrop hidden">
+      <div id="quizModalBox" class="modal-box">
+        <div class="quiz-meta">
+          <span id="quizCategory" class="tag tag-cat">Kategori</span>
+          <span id="quizDifficulty" class="tag tag-EASY">EASY</span>
+          <button id="btnCloseQuiz" style="background:none; border:1px solid #475569; color:#cbd5e1; border-radius:6px; padding:3px 9px; cursor:pointer; font-size:0.75rem;">✖ Menghindar (ESC)</button>
+        </div>
+        <div class="quiz-warning">⚠️ Monster tetap bergerak di luar! Jawab dengan cepat dan tepat!</div>
+        <div id="quizQuestionText" class="quiz-question">Pertanyaan muncul di sini...</div>
+        <div id="quizOptionsList" class="options-list"></div>
+        <div id="quizFeedbackBox" class="feedback-box hidden"></div>
+        <button id="btnQuizContinue" class="btn btn-primary hidden" style="margin-top:14px;">LANJUTKAN PETUALANGAN ▶</button>
+      </div>
+    </div>
+
+    <!-- ==================== CURSED CHEST GACHA MODAL ==================== -->
+    <div id="gachaModal" class="modal-backdrop hidden">
+      <div class="modal-box" style="text-align:center;">
+        <div class="tag tag-HARD" style="display:inline-block; margin-bottom:8px;">🎲 CURSED CHEST TERBUKA!</div>
+        <h2 class="font-fantasy" style="color:var(--accent-gold); font-size:1.35rem;">KUTUKAN ATAU BERKAH?</h2>
+        <div id="gachaIcon" class="gacha-chest-art">🧰</div>
+        <p id="gachaStatusText" style="font-size:0.95rem; color:#e2e8f0; min-height:48px; line-height:1.5;">
+          Mengocok takdir dari peti kuno...
+        </p>
+        <button id="btnGachaConfirm" class="btn btn-primary hidden" style="margin-top:14px;">TERIMA TAKDIR ▶</button>
+      </div>
+    </div>
+
+    <!-- ==================== GAME OVER SCREEN ==================== -->
+    <section id="gameOverScreen" class="screen hidden">
+      <div class="menu-card" style="border-color: var(--danger);">
+        <div class="game-title" style="color: var(--danger); text-shadow: 0 4px 0 #450a0a;">GAME OVER</div>
+        <div class="game-subtitle" style="color:#fecaca;">KUTUKAN ELDER LICH MENELANMU...</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Petualang</div>
+            <div class="stat-value" id="goPlayerName">Petualang</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Waktu Bertahan</div>
+            <div class="stat-value" id="goTime">00:00</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Soal Terjawab</div>
+            <div class="stat-value" id="goCorrect">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Posisi Terakhir</div>
+            <div class="stat-value" id="goLevel">Level 1</div>
+          </div>
+        </div>
+        <div class="btn-stack">
+          <button id="btnTryAgain" class="btn btn-primary">🔄 TRY AGAIN</button>
+          <button id="btnGoMainMenu" class="btn btn-secondary">🏠 MAIN MENU</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VICTORY SCREEN ==================== -->
+    <section id="victoryScreen" class="screen hidden">
+      <div class="menu-card" style="border-color: var(--accent-gold);">
+        <div class="game-title">VICTORY!</div>
+        <div class="game-subtitle" style="color:#6ee7b7;">THE CURSE HAS BEEN BROKEN.</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Nama Pemain</div>
+            <div class="stat-value" id="vicPlayerName">Petualang</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Waktu</div>
+            <div class="stat-value" id="vicTime">00:00</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Jawaban Benar</div>
+            <div class="stat-value" id="vicCorrect">7</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Peti Selesai</div>
+            <div class="stat-value" id="vicChests">7 / 7</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Ability Diperoleh</div>
+            <div class="stat-value" id="vicAbilityEarned">6</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Ability Digunakan</div>
+            <div class="stat-value" id="vicAbilityUsed">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Sisa Nyawa</div>
+            <div class="stat-value" id="vicLives">❤️❤️❤️</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Status</div>
+            <div class="stat-value" style="color:#10b981;">LEGENDARY ESCAPE</div>
+          </div>
+        </div>
+        <div class="btn-stack">
+          <button id="btnPlayAgain" class="btn btn-primary">⚔️ PLAY AGAIN</button>
+          <button id="btnVicMainMenu" class="btn btn-secondary">🏠 MAIN MENU</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * BANK SOAL INFORMATIKA SMP (KELAS 7, 8, 9 - SEMESTER GASAL)
+     * 55 Soal Pilihan Ganda Universal mencakup 20 Kategori Informatika
+     * Mudah diedit dan dikembangkan.
+     * ============================================================================
+     */
+    const QUESTION_BANK = [
+      // 1. Berpikir Komputasional
+      {
+        id: "INF-01",
+        category: "Berpikir Komputasional",
+        difficulty: "EASY",
+        question: "Apa tujuan utama dari menerapkan berpikir komputasional (computational thinking) dalam kehidupan sehari-hari?",
+        options: [
+          "Memecahkan masalah kompleks secara sistematis, efektif, dan efisien",
+          "Menghafal semua kode bahasa pemrograman tingkat lanjut",
+          "Menggantikan seluruh pekerjaan manusia dengan robot",
+          "Memperbaiki kerusakan fisik pada komponen monitor komputer"
+        ],
+        answerIndex: 0,
+        explanation: "Berpikir komputasional adalah metode pemecahan masalah dengan menguraikan persoalan agar solusi dapat dirancang secara logis, efektif, dan efisien."
+      },
+      {
+        id: "INF-02",
+        category: "Berpikir Komputasional",
+        difficulty: "MEDIUM",
+        question: "Terdapat 4 pilar utama dalam berpikir komputasional. Pilar manakah yang berfokus pada penyusunan langkah-langkah penyelesaian masalah secara berurutan?",
+        options: [
+          "Algoritma (Algorithm)",
+          "Abstraksi (Abstraction)",
+          "Dekomposisi (Decomposition)",
+          "Pengenalan Pola (Pattern Recognition)"
+        ],
+        answerIndex: 0,
+        explanation: "Algoritma adalah proses menyusun urutan langkah-langkah logis dan sistematis untuk menyelesaikan suatu masalah."
+      },
+      {
+        id: "INF-03",
+        category: "Berpikir Komputasional",
+        difficulty: "HARD",
+        question: "Seorang siswa merencanakan acara pentas seni sekolah dengan membaginya menjadi tim acara, tim perlengkapan, dan tim konsumsi, lalu menyusun jadwal kerja tiap tim. Pendekatan ini menggabungkan dua pilar berpikir komputasional, yaitu...",
+        options: [
+          "Dekomposisi dan Algoritma",
+          "Abstraksi dan Pengenalan Pola",
+          "Pengenalan Pola dan Enkripsi",
+          "Hardware dan Sistem Operasi"
+        ],
+        answerIndex: 0,
+        explanation: "Membagi kepanitiaan menjadi bagian-bagian kecil adalah dekomposisi, sedangkan menyusun jadwal urutan kerja adalah algoritma."
+      },
+
+      // 2. Dekomposisi
+      {
+        id: "INF-04",
+        category: "Dekomposisi",
+        difficulty: "EASY",
+        question: "Memecah masalah besar menjadi bagian-bagian kecil yang lebih mudah dikelola disebut...",
+        options: [
+          "Dekomposisi",
+          "Kompilasi",
+          "Abstraksi",
+          "Simulasi"
+        ],
+        answerIndex: 0,
+        explanation: "Dekomposisi (decomposition) adalah teknik memecah masalah kompleks menjadi sub-masalah yang lebih kecil dan mudah diselesaikan."
+      },
+      {
+        id: "INF-05",
+        category: "Dekomposisi",
+        difficulty: "MEDIUM",
+        question: "Manakah contoh penerapan dekomposisi saat membuat sebuah game petualangan 2D?",
+        options: [
+          "Memisahkan pembuatan desain karakter, peta level, sistem skor, dan efek suara",
+          "Mengabaikan warna latar belakang agar fokus pada gerakan karakter",
+          "Menyamakan cara kerja semua musuh agar tidak perlu membuat kode baru",
+          "Menjalankan game langsung tanpa memeriksa kesalahan program"
+        ],
+        answerIndex: 0,
+        explanation: "Memecah proyek game menjadi modul karakter, peta, skor, dan suara merupakan contoh nyata dekomposisi."
+      },
+
+      // 3. Pengenalan Pola
+      {
+        id: "INF-06",
+        category: "Pengenalan Pola",
+        difficulty: "EASY",
+        question: "Kemampuan melihat kesamaan, keteraturan, atau tren berulang dari sekumpulan data atau masalah disebut...",
+        options: [
+          "Pengenalan Pola",
+          "Dekomposisi",
+          "Debugging",
+          "Virtualisasi"
+        ],
+        answerIndex: 0,
+        explanation: "Pengenalan pola (pattern recognition) membantu kita memprediksi dan menyelesaikan masalah baru berdasarkan kemiripan dengan masalah sebelumnya."
+      },
+      {
+        id: "INF-07",
+        category: "Pengenalan Pola",
+        difficulty: "MEDIUM",
+        question: "Perhatikan deret kode sandi berikut: 2, 6, 12, 20, 30, ... Angka berikutnya yang tepat berdasarkan pola tersebut adalah...",
+        options: [
+          "42",
+          "40",
+          "38",
+          "44"
+        ],
+        answerIndex: 0,
+        explanation: "Selisih antar bilangan bertambah secara teratur: +4, +6, +8, +10, maka berikutnya +12 sehingga 30 + 12 = 42."
+      },
+      {
+        id: "INF-08",
+        category: "Pengenalan Pola",
+        difficulty: "HARD",
+        question: "Sebuah lampu mercusuar berkedip dengan urutan warna: Merah, Biru, Hijau, Kuning, Merah, Biru, ... Warna lampu pada kedipan ke-27 adalah...",
+        options: [
+          "Hijau",
+          "Merah",
+          "Biru",
+          "Kuning"
+        ],
+        answerIndex: 0,
+        explanation: "Pola berulang setiap 4 kedipan. Karena 27 dibagi 4 bersisa 3, maka kedipan ke-27 sama dengan urutan ke-3 yaitu Hijau."
+      },
+
+      // 4. Abstraksi
+      {
+        id: "INF-09",
+        category: "Abstraksi",
+        difficulty: "EASY",
+        question: "Proses menyaring informasi dengan fokus pada hal-hal penting dan mengabaikan detail yang tidak relevan disebut...",
+        options: [
+          "Abstraksi",
+          "Dekomposisi",
+          "Iterasi",
+          "Ekstraksi"
+        ],
+        answerIndex: 0,
+        explanation: "Abstraksi (abstraction) menyederhanakan masalah dengan hanya mengambil informasi inti yang dibutuhkan."
+      },
+      {
+        id: "INF-10",
+        category: "Abstraksi",
+        difficulty: "MEDIUM",
+        question: "Peta jalur kereta api (KRL/MRT) hanya menampilkan nama stasiun dan garis rute tanpa menggambar gedung atau pohon di sekitarnya. Hal ini menerapkan konsep...",
+        options: [
+          "Abstraksi",
+          "Dekomposisi",
+          "Enkripsi Data",
+          "Penyimpanan Awan"
+        ],
+        answerIndex: 0,
+        explanation: "Peta transit membuang detail geografis yang tidak perlu agar penumpang fokus pada rute dan stasiun (abstraksi)."
+      },
+
+      // 5. Algoritma
+      {
+        id: "INF-11",
+        category: "Algoritma",
+        difficulty: "EASY",
+        question: "Simbol berbentuk belah ketupat (diamond) pada diagram alir (flowchart) berfungsi untuk menyatakan...",
+        options: [
+          "Keputusan atau percabangan kondisi (Ya/Tidak)",
+          "Awal atau akhir dari sebuah program",
+          "Proses perhitungan matematika",
+          "Input atau output data"
+        ],
+        answerIndex: 0,
+        explanation: "Simbol belah ketupat (decision) digunakan untuk memeriksa kondisi logika yang menghasilkan cabang Ya/Benar atau Tidak/Salah."
+      },
+      {
+        id: "INF-12",
+        category: "Algoritma",
+        difficulty: "MEDIUM",
+        question: "Perhatikan instruksi algoritma: (1) Set Nilai = 10, (2) Jika Nilai > 5 maka Nilai = Nilai + 4, (3) Selain itu Nilai = Nilai - 2, (4) Tampilkan Nilai. Hasil akhir yang tampil adalah...",
+        options: [
+          "14",
+          "8",
+          "10",
+          "12"
+        ],
+        answerIndex: 0,
+        explanation: "Karena Nilai awal adalah 10 (lebih besar dari 5), maka kondisi terpenuhi dan Nilai ditambah 4 menjadi 14."
+      },
+      {
+        id: "INF-13",
+        category: "Algoritma",
+        difficulty: "HARD",
+        question: "Sebuah robot bergerak pada petak koordinat mulai dari (0,0) menghadap Utara. Ia menjalankan perintah: Maju 3 langkah, Belok Kanan, Maju 2 langkah, Belok Kanan, Maju 1 langkah. Di koordinat (X,Y) manakah robot berhenti?",
+        options: [
+          "(2, 2)",
+          "(3, 2)",
+          "(2, 3)",
+          "(-2, 2)"
+        ],
+        answerIndex: 0,
+        explanation: "Dari (0,0) ke Utara 3 langkah -> (0,3). Belok kanan (Timur) maju 2 langkah -> (2,3). Belok kanan (Selatan) maju 1 langkah -> (2,2)."
+      },
+
+      // 6. Logika dan Pemecahan Masalah
+      {
+        id: "INF-14",
+        category: "Logika & Pemecahan Masalah",
+        difficulty: "EASY",
+        question: "Dalam gerbang logika atau pemrograman, operator AND akan menghasilkan nilai BENAR (True) apabila...",
+        options: [
+          "Semua kondisi yang dibandingkan bernilai BENAR",
+          "Salah satu kondisi saja bernilai BENAR",
+          "Semua kondisi bernilai SALAH",
+          "Kondisi pertama bernilai SALAH"
+        ],
+        answerIndex: 0,
+        explanation: "Operator logika AND hanya bernilai True jika seluruh pernyataan inputnya bernilai True."
+      },
+      {
+        id: "INF-15",
+        category: "Logika & Pemecahan Masalah",
+        difficulty: "MEDIUM",
+        question: "Syarat membuka pintu gerbang kastil adalah: (Memiliki Kunci Emas OR Mengalahkan Penjaga) AND Waktu Malam. Jika saat ini Waktu Malam dan pemain tidak memiliki Kunci Emas tetapi berhasil mengalahkan Penjaga, apakah gerbang terbuka?",
+        options: [
+          "Ya, karena salah satu syarat dalam tanda kurung terpenuhi dan saat ini Waktu Malam",
+          "Tidak, karena pemain wajib memiliki Kunci Emas",
+          "Tidak, karena operator OR tidak boleh digabung dengan AND",
+          "Ya, meskipun saat ini bukan Waktu Malam"
+        ],
+        answerIndex: 0,
+        explanation: "(False OR True) menghasilkan True. Lalu True AND True (Waktu Malam) menghasilkan True, sehingga gerbang terbuka."
+      },
+      {
+        id: "INF-16",
+        category: "Logika & Pemecahan Masalah",
+        difficulty: "HARD",
+        question: "Tiga peti (Merah, Biru, Hijau) masing-masing berlabel: Peti Merah: 'Harta di sini', Peti Biru: 'Harta tidak di sini', Peti Hijau: 'Harta tidak di Peti Merah'. Jika hanya SATU label yang berkata jujur, di manakah harta berada?",
+        options: [
+          "Peti Biru",
+          "Peti Merah",
+          "Peti Hijau",
+          "Tidak ada di ketiganya"
+        ],
+        answerIndex: 0,
+        explanation: "Jika harta di Peti Biru: label Merah salah, label Biru salah, dan label Hijau ('tidak di Merah') benar. Tepat satu label yang jujur!"
+      },
+
+      // 7. Perangkat Keras Komputer
+      {
+        id: "INF-17",
+        category: "Perangkat Keras",
+        difficulty: "EASY",
+        question: "Komponen perangkat keras yang dijuluki sebagai 'otak komputer' karena bertugas memproses seluruh instruksi dan perhitungan adalah...",
+        options: [
+          "CPU (Central Processing Unit)",
+          "RAM (Random Access Memory)",
+          "Hard Disk Drive (HDD)",
+          "Power Supply Unit (PSU)"
+        ],
+        answerIndex: 0,
+        explanation: "CPU adalah unit pemroses utama yang menjalankan perintah dan mengolah data pada sistem komputer."
+      },
+      {
+        id: "INF-18",
+        category: "Perangkat Keras",
+        difficulty: "EASY",
+        question: "Manakah kelompok perangkat berikut yang seluruhnya termasuk perangkat masukan (input device)?",
+        options: [
+          "Keyboard, Mouse, Scanner, Mikrofon",
+          "Monitor, Printer, Speaker, Proyektor",
+          "RAM, Processor, Motherboard, VGA Card",
+          "Flashdisk, Harddisk, SSD, CD-ROM"
+        ],
+        answerIndex: 0,
+        explanation: "Keyboard, mouse, scanner, dan mikrofon berfungsi memasukkan data/perintah dari pengguna ke dalam komputer."
+      },
+      {
+        id: "INF-19",
+        category: "Perangkat Keras",
+        difficulty: "MEDIUM",
+        question: "Mengapa komputer memerlukan RAM padahal sudah memiliki Harddisk/SSD berkapasitas besar?",
+        options: [
+          "RAM menyediakan akses baca/tulis super cepat sementara bagi CPU untuk aplikasi yang sedang berjalan",
+          "RAM menyimpan file foto dan video secara permanen saat listrik mati",
+          "RAM berfungsi mendinginkan suhu prosesor agar tidak panas",
+          "RAM mengubah sinyal digital menjadi tampilan gambar di layar"
+        ],
+        answerIndex: 0,
+        explanation: "RAM bersifat volatile (sementara) namun memiliki kecepatan akses jauh lebih tinggi daripada penyimpanan permanen untuk mendukung kerja CPU."
+      },
+
+      // 8. Perangkat Lunak
+      {
+        id: "INF-20",
+        category: "Perangkat Lunak",
+        difficulty: "EASY",
+        question: "Perangkat lunak yang dapat digunakan, dimodifikasi, dan disebarluaskan kode sumbernya secara bebas disebut...",
+        options: [
+          "Open Source Software",
+          "Proprietary Software",
+          "Malware",
+          "Firmware"
+        ],
+        answerIndex: 0,
+        explanation: "Open Source Software (seperti Linux, LibreOffice, GIMP) membuka kode sumbernya agar dapat dipelajari dan dikembangkan bersama."
+      },
+      {
+        id: "INF-21",
+        category: "Perangkat Lunak",
+        difficulty: "MEDIUM",
+        question: "Manakah pasangan jenis perangkat lunak dan fungsinya yang paling tepat?",
+        options: [
+          "Web Browser – Mengakses dan menampilkan halaman situs di internet",
+          "Compiler – Membersihkan debu pada kipas pendingin laptop",
+          "Antivirus – Menyusun rumus keuangan dan grafik batang",
+          "Driver – Menggantikan fungsi sistem operasi utama"
+        ],
+        answerIndex: 0,
+        explanation: "Web browser (seperti Chrome, Firefox) adalah aplikasi untuk menjelajahi dan merender halaman web."
+      },
+
+      // 9. Sistem Operasi
+      {
+        id: "INF-22",
+        category: "Sistem Operasi",
+        difficulty: "EASY",
+        question: "Manakah yang BUKAN merupakan contoh sistem operasi (Operating System)?",
+        options: [
+          "Microsoft Excel",
+          "Linux Ubuntu",
+          "Microsoft Windows",
+          "Android"
+        ],
+        answerIndex: 0,
+        explanation: "Microsoft Excel adalah perangkat lunak aplikasi pengolah angka, sedangkan Windows, Linux, dan Android adalah sistem operasi."
+      },
+      {
+        id: "INF-23",
+        category: "Sistem Operasi",
+        difficulty: "MEDIUM",
+        question: "Apa peran utama Sistem Operasi sebagai jembatan antara pengguna, aplikasi, dan perangkat keras?",
+        options: [
+          "Mengelola sumber daya CPU, memori, file, serta mengatur komunikasi antar perangkat",
+          "Membuat koneksi internet menjadi gratis tanpa kuota",
+          "Mendesain tampilan poster dan animasi tiga dimensi secara otomatis",
+          "Menambah kapasitas fisik harddisk secara permanen"
+        ],
+        answerIndex: 0,
+        explanation: "Sistem operasi bertugas mengatur manajemen memori, prosesor, perangkat I/O, serta sistem berkas agar aplikasi dapat berjalan."
+      },
+
+      // 10. Input, Process, Output
+      {
+        id: "INF-24",
+        category: "Input-Process-Output",
+        difficulty: "EASY",
+        question: "Urutan siklus kerja dasar pada setiap sistem komputer adalah...",
+        options: [
+          "Input -> Process -> Output",
+          "Process -> Input -> Output",
+          "Output -> Process -> Input",
+          "Storage -> Output -> Input"
+        ],
+        answerIndex: 0,
+        explanation: "Komputer menerima masukan (Input), mengolahnya di CPU (Process), lalu menyajikan hasilnya (Output)."
+      },
+      {
+        id: "INF-25",
+        category: "Input-Process-Output",
+        difficulty: "MEDIUM",
+        question: "Pada mesin kasir swalayan yang memindai barcode barang hingga mencetak struk belanja, tahapan 'Process' terjadi saat...",
+        options: [
+          "Komputer mencocokkan kode barcode dengan database harga dan menghitung total belanja",
+          "Kasir mengarahkan pemindai laser ke kode batang kemasan",
+          "Printer termal mencetak kertas rincian pembayaran",
+          "Pembeli menyerahkan uang tunai kepada kasir"
+        ],
+        answerIndex: 0,
+        explanation: "Pemindaian adalah Input, pencetakan struk adalah Output, sedangkan pencarian harga dan penjumlahan total adalah Process."
+      },
+
+      // 11. Penyimpanan Data
+      {
+        id: "INF-26",
+        category: "Penyimpanan Data",
+        difficulty: "EASY",
+        question: "Urutan satuan kapasitas penyimpanan data digital dari yang terkecil hingga terbesar adalah...",
+        options: [
+          "Byte - Kilobyte (KB) - Megabyte (MB) - Gigabyte (GB)",
+          "Kilobyte (KB) - Byte - Gigabyte (GB) - Megabyte (MB)",
+          "Megabyte (MB) - Kilobyte (KB) - Byte - Terabyte (TB)",
+          "Gigabyte (GB) - Megabyte (MB) - Kilobyte (KB) - Byte"
+        ],
+        answerIndex: 0,
+        explanation: "Urutan kapasitas data digital yang benar adalah Byte -> KB -> MB -> GB -> TB."
+      },
+      {
+        id: "INF-27",
+        category: "Penyimpanan Data",
+        difficulty: "MEDIUM",
+        question: "Apa keunggulan utama Solid State Drive (SSD) dibandingkan Hard Disk Drive (HDD) konvensional?",
+        options: [
+          "Kecepatan baca/tulis jauh lebih tinggi dan tahan guncangan karena tidak memakai piringan berputar",
+          "Harganya selalu lebih murah per gigabyte dibandingkan pita kaset",
+          "Dapat bekerja tanpa terhubung ke papan induk (motherboard)",
+          "Tidak membutuhkan daya listrik sama sekali saat komputer menyala"
+        ],
+        answerIndex: 0,
+        explanation: "SSD menggunakan chip memori flash tanpa komponen mekanik bergerak sehingga lebih cepat, hening, dan tahan guncangan."
+      },
+
+      // 12. File, Folder, dan Ekstensi
+      {
+        id: "INF-28",
+        category: "File, Folder & Ekstensi",
+        difficulty: "EASY",
+        question: "Ekstensi file berikut manakah yang menandakan sebuah berkas gambar digital?",
+        options: [
+          ".png dan .jpg",
+          ".mp3 dan .wav",
+          ".docx dan .txt",
+          ".xlsx dan .csv"
+        ],
+        answerIndex: 0,
+        explanation: "Ekstensi .png dan .jpg/.jpeg adalah format standar untuk berkas gambar raster."
+      },
+      {
+        id: "INF-29",
+        category: "File, Folder & Ekstensi",
+        difficulty: "MEDIUM",
+        question: "Mengapa mengubah ekstensi file 'lagu.mp3' secara manual menjadi 'lagu.pdf' tidak membuat file tersebut bisa dibaca sebagai dokumen PDF?",
+        options: [
+          "Karena ekstensi hanya penanda jenis file, sedangkan struktur data biner di dalamnya tetap format audio MP3",
+          "Karena ukuran file PDF tidak boleh lebih dari 100 kilobyte",
+          "Karena sistem operasi melarang file memiliki huruf vokal pada namanya",
+          "Karena file MP3 otomatis terhapus jika namanya diubah"
+        ],
+        answerIndex: 0,
+        explanation: "Mengganti nama ekstensi tidak mengonversi struktur data internal file, sehingga aplikasi pembaca PDF akan menganggapnya rusak."
+      },
+
+      // 13. Bilangan Biner dan Desimal
+      {
+        id: "INF-30",
+        category: "Bilangan Biner & Desimal",
+        difficulty: "EASY",
+        question: "Sistem bilangan biner yang digunakan komputer untuk merepresentasikan seluruh data hanya terdiri atas dua digit angka, yaitu...",
+        options: [
+          "0 dan 1",
+          "1 dan 2",
+          "0 dan 9",
+          "1 dan 10"
+        ],
+        answerIndex: 0,
+        explanation: "Sistem bilangan biner (basis 2) hanya menggunakan simbol 0 (off/mati) dan 1 (on/nyala)."
+      },
+      {
+        id: "INF-31",
+        category: "Bilangan Biner & Desimal",
+        difficulty: "MEDIUM",
+        question: "Berapakah nilai bilangan desimal dari bilangan biner 1011₂?",
+        options: [
+          "11",
+          "13",
+          "9",
+          "15"
+        ],
+        answerIndex: 0,
+        explanation: "1011₂ = (1×8) + (0×4) + (1×2) + (1×1) = 8 + 0 + 2 + 1 = 11."
+      },
+      {
+        id: "INF-32",
+        category: "Bilangan Biner & Desimal",
+        difficulty: "HARD",
+        question: "Sebuah kunci gerbang membutuhkan kode biner dari angka desimal 22. Manakah representasi biner 5-bit yang benar untuk angka 22?",
+        options: [
+          "10110",
+          "10101",
+          "11010",
+          "10011"
+        ],
+        answerIndex: 0,
+        explanation: "22 = 16 + 4 + 2 = (1×16) + (0×8) + (1×4) + (1×2) + (0×1) = 10110₂."
+      },
+
+      // 14. Jaringan Komputer
+      {
+        id: "INF-33",
+        category: "Jaringan Komputer",
+        difficulty: "EASY",
+        question: "Jaringan komputer yang menghubungkan perangkat dalam area terbatas seperti satu ruang laboratorium sekolah atau gedung kantor disebut...",
+        options: [
+          "LAN (Local Area Network)",
+          "WAN (Wide Area Network)",
+          "PAN (Personal Area Network)",
+          "MAN (Metropolitan Area Network)"
+        ],
+        answerIndex: 0,
+        explanation: "LAN mencakup area lokal yang relatif sempit seperti rumah, sekolah, atau satu gedung perkantoran."
+      },
+      {
+        id: "INF-34",
+        category: "Jaringan Komputer",
+        difficulty: "MEDIUM",
+        question: "Apa fungsi utama perangkat Router dalam jaringan komputer rumah atau sekolah?",
+        options: [
+          "Menghubungkan dua atau lebih jaringan berbeda serta mengarahkan paket data menuju tujuan yang tepat",
+          "Mencetak dokumen secara nirkabel ke seluruh ruangan",
+          "Menyimpan cadangan sistem operasi secara offline",
+          "Meningkatkan resolusi layar monitor komputer klien"
+        ],
+        answerIndex: 0,
+        explanation: "Router bertugas melakukan routing (penentuan jalur) paket data antar jaringan, misalnya dari jaringan lokal (LAN) ke internet."
+      },
+      {
+        id: "INF-35",
+        category: "Jaringan Komputer",
+        difficulty: "HARD",
+        question: "Setiap perangkat yang terhubung ke jaringan berbasis TCP/IP memerlukan alamat unik agar paket data tidak salah kirim. Alamat numerik unik ini disebut...",
+        options: [
+          "IP Address",
+          "URL Address",
+          "HTML Tag",
+          "BIOS Version"
+        ],
+        answerIndex: 0,
+        explanation: "IP Address (Internet Protocol Address) adalah identitas numerik unik setiap perangkat dalam jaringan komputer."
+      },
+
+      // 15. Internet dan Keamanan Digital
+      {
+        id: "INF-36",
+        category: "Internet & Keamanan Digital",
+        difficulty: "EASY",
+        question: "Tanda gembok dan awalan protokol 'https://' pada alamat situs web menunjukkan bahwa...",
+        options: [
+          "Komunikasi data antara browser dan server telah terenkripsi sehingga lebih aman",
+          "Situs web tersebut bebas dari semua iklan komersial",
+          "Situs web tersebut dapat dibuka tanpa koneksi internet",
+          "Komputer pengguna tidak memerlukan kata sandi lagi"
+        ],
+        answerIndex: 0,
+        explanation: "HTTPS menggunakan enkripsi SSL/TLS untuk melindungi kerahasiaan data yang dikirim antara pengguna dan server."
+      },
+      {
+        id: "INF-37",
+        category: "Internet & Keamanan Digital",
+        difficulty: "MEDIUM",
+        question: "Upaya penipuan digital dengan menyamar sebagai lembaga resmi melalui pesan atau situs palsu untuk mencuri kata sandi dan data pribadi disebut...",
+        options: [
+          "Phishing",
+          "Encryption",
+          "Defragmentation",
+          "Streaming"
+        ],
+        answerIndex: 0,
+        explanation: "Phishing adalah teknik rekayasa sosial untuk memancing korban agar menyerahkan informasi sensitif pada halaman atau tautan palsu."
+      },
+      {
+        id: "INF-38",
+        category: "Internet & Keamanan Digital",
+        difficulty: "HARD",
+        question: "Mengapa mengaktifkan Two-Factor Authentication (2FA) sangat disarankan untuk keamanan akun digital?",
+        options: [
+          "Karena meskipun kata sandi bocor, peretas tetap membutuhkan kode verifikasi kedua (seperti OTP/aplikasi autentikator)",
+          "Karena 2FA membuat kata sandi tidak perlu dibuat rumit lagi",
+          "Karena 2FA mempercepat kecepatan unduh file hingga dua kali lipat",
+          "Karena 2FA otomatis menghapus seluruh riwayat penjelajahan"
+        ],
+        answerIndex: 0,
+        explanation: "2FA menambah lapisan keamanan ganda dengan mewajibkan dua bukti identitas berbeda sebelum akses akun diberikan."
+      },
+
+      // 16. Etika Digital
+      {
+        id: "INF-39",
+        category: "Etika Digital",
+        difficulty: "EASY",
+        question: "Sikap yang mencerminkan etika digital (netiquette) yang baik saat berdiskusi di forum online adalah...",
+        options: [
+          "Menggunakan bahasa yang sopan, menghargai pendapat orang lain, dan tidak menyebarkan hoaks",
+          "Menulis seluruh komentar dengan huruf kapital agar terlihat tegas",
+          "Membagikan data pribadi teman tanpa izin sebagai bahan candaan",
+          "Mengunduh karya orang lain dan mengakuinya sebagai karya sendiri"
+        ],
+        answerIndex: 0,
+        explanation: "Etika digital menuntut kesantunan, penghormatan privasi, serta penghindaran ujaran kebencian maupun informasi palsu."
+      },
+      {
+        id: "INF-40",
+        category: "Etika Digital",
+        difficulty: "MEDIUM",
+        question: "Ketika menggunakan gambar atau artikel dari internet untuk tugas presentasi sekolah, tindakan yang paling etis adalah...",
+        options: [
+          "Mencantumkan sumber atau kredit pembuat asli serta mematuhi lisensi penggunaannya",
+          "Menghapus tanda air (watermark) pemilik karya agar terlihat rapi",
+          "Mengaku sebagai pembuat asli gambar tersebut di depan kelas",
+          "Menjual kembali gambar tersebut tanpa izin pemilik hak cipta"
+        ],
+        answerIndex: 0,
+        explanation: "Menghargai hak kekayaan intelektual dilakukan dengan mencantumkan sumber referensi dan mematuhi ketentuan lisensi."
+      },
+
+      // 17. Informasi dan Data
+      {
+        id: "INF-41",
+        category: "Informasi & Data",
+        difficulty: "EASY",
+        question: "Apa perbedaan mendasar antara 'Data' dan 'Informasi' dalam Informatika?",
+        options: [
+          "Data adalah fakta mentah, sedangkan informasi adalah data yang telah diolah sehingga memiliki makna",
+          "Data selalu berbentuk gambar, sedangkan informasi selalu berbentuk angka",
+          "Data hanya ada di internet, sedangkan informasi hanya ada di buku cetak",
+          "Data berukuran lebih besar daripada informasi"
+        ],
+        answerIndex: 0,
+        explanation: "Data merupakan catatan fakta mentah (misal: angka suhu harian), sedangkan informasi adalah hasil olahannya (misal: rata-rata suhu bulan ini)."
+      },
+      {
+        id: "INF-42",
+        category: "Informasi & Data",
+        difficulty: "MEDIUM",
+        question: "Cara terbaik memverifikasi kebenaran sebuah berita viral di media sosial sebelum membagikannya adalah...",
+        options: [
+          "Memeriksa sumber resmi, membandingkan dengan media kredibel, dan mengecek tanggal publikasi",
+          "Langsung meneruskannya ke grup keluarga agar orang lain yang mengecek",
+          "Mempercayainya jika jumlah 'Like' dan komentarnya sudah ribuan",
+          "Membaca judulnya saja tanpa membuka isi berita"
+        ],
+        answerIndex: 0,
+        explanation: "Literasi informasi mewajibkan pengecekan fakta (fact-checking) melalui sumber tepercaya sebelum menyebarkan informasi."
+      },
+
+      // 18. Penggunaan Aplikasi Produktivitas
+      {
+        id: "INF-43",
+        category: "Aplikasi Produktivitas",
+        difficulty: "EASY",
+        question: "Jenis aplikasi perkantoran yang paling tepat digunakan untuk menyusun makalah, laporan praktikum, dan surat resmi adalah...",
+        options: [
+          "Aplikasi Pengolah Kata (Word Processor)",
+          "Aplikasi Pengolah Angka (Spreadsheet)",
+          "Aplikasi Penyunting Video (Video Editor)",
+          "Aplikasi Manajemen Basis Data (DBMS)"
+        ],
+        answerIndex: 0,
+        explanation: "Word Processor (seperti Microsoft Word, Google Docs, LibreOffice Writer) dirancang khusus untuk pembuatan dan pemformatan dokumen teks."
+      },
+      {
+        id: "INF-44",
+        category: "Aplikasi Produktivitas",
+        difficulty: "MEDIUM",
+        question: "Fitur 'Mail Merge' pada aplikasi pengolah kata sangat bermanfaat ketika kita ingin...",
+        options: [
+          "Membuat ratusan sertifikat atau surat undangan dengan format sama tetapi nama penerima berbeda secara otomatis",
+          "Menggabungkan beberapa file video menjadi satu film pendek",
+          "Mengirim pesan suara secara langsung melalui Bluetooth",
+          "Mengubah dokumen teks menjadi tabel perhitungan otomatis"
+        ],
+        answerIndex: 0,
+        explanation: "Mail Merge menghubungkan templat dokumen dengan sumber data daftar penerima untuk menghasilkan banyak dokumen personal sekaligus."
+      },
+
+      // 19. Spreadsheet dan Pengolahan Data
+      {
+        id: "INF-45",
+        category: "Spreadsheet & Pengolahan Data",
+        difficulty: "EASY",
+        question: "Setiap penulisan rumus (formula) atau fungsi pada aplikasi spreadsheet seperti Excel atau Google Sheets wajib diawali dengan tanda...",
+        options: [
+          "Sama dengan (=)",
+          "Tanda pagar (#)",
+          "Tanda tanya (?)",
+          "Tanda bintang (*)"
+        ],
+        answerIndex: 0,
+        explanation: "Tanda sama dengan (=) memberi tahu aplikasi spreadsheet bahwa karakter berikutnya adalah rumus yang harus dihitung."
+      },
+      {
+        id: "INF-46",
+        category: "Spreadsheet & Pengolahan Data",
+        difficulty: "MEDIUM",
+        question: "Fungsi pada aplikasi spreadsheet yang digunakan untuk menghitung nilai rata-rata dari sekumpulan sel B2 sampai B10 adalah...",
+        options: [
+          "=AVERAGE(B2:B10)",
+          "=SUM(B2:B10)",
+          "=COUNT(B2:B10)",
+          "=MAX(B2:B10)"
+        ],
+        answerIndex: 0,
+        explanation: "AVERAGE menghitung rata-rata aritmetika, SUM menjumlahkan, COUNT menghitung jumlah sel berisi angka, dan MAX mencari nilai tertinggi."
+      },
+      {
+        id: "INF-47",
+        category: "Spreadsheet & Pengolahan Data",
+        difficulty: "HARD",
+        question: "Jika sel A1 berisi nilai 75 dan kita menuliskan rumus =IF(A1>=80, \"Lulus\", \"Remedial\"), hasil yang ditampilkan pada sel tersebut adalah...",
+        options: [
+          "Remedial",
+          "Lulus",
+          "75",
+          "ERROR"
+        ],
+        answerIndex: 0,
+        explanation: "Karena 75 tidak memenuhi syarat >= 80 (bernilai False), fungsi IF akan menampilkan argumen kedua yaitu 'Remedial'."
+      },
+
+      // 20. Kecerdasan Buatan Dasar
+      {
+        id: "INF-48",
+        category: "Kecerdasan Buatan Dasar",
+        difficulty: "EASY",
+        question: "Apa yang dimaksud dengan Kecerdasan Buatan (Artificial Intelligence / AI)?",
+        options: [
+          "Kemampuan sistem komputer untuk meniru kecerdasan manusia seperti belajar, mengenali pola, dan mengambil keputusan",
+          "Perangkat keras monitor yang memiliki layar melengkung",
+          "Kabel jaringan berkecepatan tinggi di dasar laut",
+          "Program antivirus yang hanya bekerja tanpa listrik"
+        ],
+        answerIndex: 0,
+        explanation: "AI memungkinkan mesin belajar dari pengalaman/data untuk menjalankan tugas yang umumnya membutuhkan kecerdasan manusia."
+      },
+      {
+        id: "INF-49",
+        category: "Kecerdasan Buatan Dasar",
+        difficulty: "MEDIUM",
+        question: "Manakah contoh penerapan Kecerdasan Buatan (AI) yang sering dijumpai dalam kehidupan sehari-hari?",
+        options: [
+          "Asisten suara virtual, rekomendasi video otomatis, dan filter pengenalan wajah pada kamera",
+          "Kalkulator saku sederhana yang hanya bisa menjumlahkan dua angka",
+          "Lampu senter baterai yang menyala saat tombol digeser",
+          "Kipas angin listrik dengan tiga tombol kecepatan"
+        ],
+        answerIndex: 0,
+        explanation: "Pengenalan suara, sistem rekomendasi konten, dan deteksi wajah menggunakan algoritma Machine Learning bagian dari AI."
+      },
+      {
+        id: "INF-50",
+        category: "Kecerdasan Buatan Dasar",
+        difficulty: "HARD",
+        question: "Dalam Machine Learning, mengapa kualitas dan keberagaman data latih (training data) sangat memengaruhi hasil prediksi AI?",
+        options: [
+          "Karena model AI belajar pola dari data latih; jika datanya bias atau kurang akurat, keputusan AI juga akan bias",
+          "Karena data latih menentukan warna casing laptop pengguna",
+          "Karena AI hanya bisa membaca data yang ditulis dengan tinta merah",
+          "Karena semakin sedikit data latih, semakin pintar sistem AI"
+        ],
+        answerIndex: 0,
+        explanation: "Prinsip 'Garbage In, Garbage Out' berlaku pada AI: kualitas keputusan model sangat bergantung pada kualitas data latihnya."
+      },
+
+      // Soal Tambahan Pengayaan (51-55)
+      {
+        id: "INF-51",
+        category: "Algoritma",
+        difficulty: "EASY",
+        question: "Struktur kontrol dalam pemrograman yang menjalankan sekumpulan perintah secara berulang selama kondisi tertentu masih terpenuhi disebut...",
+        options: [
+          "Perulangan (Looping / Iterasi)",
+          "Percabangan (Branching)",
+          "Variabel Konstanta",
+          "Komentar Kode"
+        ],
+        answerIndex: 0,
+        explanation: "Perulangan (loop) memungkinkan blok instruksi dieksekusi berulang kali tanpa harus menulis kode yang sama berkali-kali."
+      },
+      {
+        id: "INF-52",
+        category: "Internet & Keamanan Digital",
+        difficulty: "EASY",
+        question: "Manakah contoh kata sandi (password) yang paling kuat dan aman untuk melindungi akun?",
+        options: [
+          "K4st!l_L1ch#2026",
+          "12345678",
+          "password123",
+          "qwertyuiop"
+        ],
+        answerIndex: 0,
+        explanation: "Kata sandi kuat memadukan huruf besar, huruf kecil, angka, dan simbol unik serta tidak menggunakan pola yang mudah ditebak."
+      },
+      {
+        id: "INF-53",
+        category: "Bilangan Biner & Desimal",
+        difficulty: "MEDIUM",
+        question: "Satu byte dalam sistem penyimpanan komputer terdiri atas berapa bit?",
+        options: [
+          "8 bit",
+          "4 bit",
+          "16 bit",
+          "2 bit"
+        ],
+        answerIndex: 0,
+        explanation: "1 Byte = 8 bit (binary digit), yang mampu merepresentasikan 256 kombinasi nilai (0 hingga 255)."
+      },
+      {
+        id: "INF-54",
+        category: "Spreadsheet & Pengolahan Data",
+        difficulty: "MEDIUM",
+        question: "Fitur pada aplikasi spreadsheet yang digunakan untuk menyaring dan menampilkan hanya baris data yang memenuhi kriteria tertentu disebut...",
+        options: [
+          "Filter",
+          "Merge & Center",
+          "Wrap Text",
+          "Page Break"
+        ],
+        answerIndex: 0,
+        explanation: "Fitur Filter menyembunyikan sementara baris yang tidak sesuai kriteria sehingga analisis data menjadi lebih fokus."
+      },
+      {
+        id: "INF-55",
+        category: "Logika & Pemecahan Masalah",
+        difficulty: "HARD",
+        question: "Dalam sebuah antrean pencetakan (print queue), dokumen pertama yang dikirim ke printer akan dicetak paling awal. Prinsip antrean ini dalam Informatika dikenal sebagai...",
+        options: [
+          "FIFO (First In, First Out)",
+          "LIFO (Last In, First Out)",
+          "Random Access",
+          "Binary Search"
+        ],
+        answerIndex: 0,
+        explanation: "Queue (antrean) bekerja dengan prinsip FIFO: elemen yang pertama masuk adalah yang pertama keluar/diproses."
+      }
+    ];
+
+    /**
+     * ============================================================================
+     * 1. AUDIO MANAGER (Web Audio API Procedural Dark Fantasy Sound & Music)
+     * ============================================================================
+     */
+    class AudioManager {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.bgmInterval = null;
+        this.bgmStep = 0;
+        this.lastStepSound = 0;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        if (this.muted) {
+          this.stopBGM();
+        } else {
+          this.init();
+          this.startBGM();
+        }
+        return this.muted;
+      }
+
+      playTone(freq, type = 'sine', duration = 0.15, vol = 0.12, slideTo = null, delay = 0) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        if (slideTo) {
+          osc.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), now + duration);
+        }
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(vol, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      }
+
+      startBGM() {
+        if (this.muted || this.bgmInterval) return;
+        this.init();
+        // Dark Fantasy D Minor / Phrygian arpeggio bassline
+        const notes = [146.83, 174.61, 220.00, 233.08, 220.00, 174.61, 155.56, 130.81];
+        this.bgmStep = 0;
+        this.bgmInterval = setInterval(() => {
+          if (this.muted) return;
+          const note = notes[this.bgmStep % notes.length];
+          this.playTone(note, 'triangle', 0.36, 0.045);
+          if (this.bgmStep % 4 === 0) {
+            this.playTone(note / 2, 'sine', 0.55, 0.06);
+          }
+          this.bgmStep++;
+        }, 420);
+      }
+
+      stopBGM() {
+        if (this.bgmInterval) {
+          clearInterval(this.bgmInterval);
+          this.bgmInterval = null;
+        }
+      }
+
+      playStep() {
+        const now = performance.now();
+        if (now - this.lastStepSound < 280) return;
+        this.lastStepSound = now;
+        this.playTone(95 + Math.random() * 25, 'triangle', 0.05, 0.03, 55);
+      }
+
+      playChestOpen() {
+        this.playTone(330, 'square', 0.12, 0.09);
+        this.playTone(440, 'square', 0.14, 0.09, null, 0.09);
+        this.playTone(587.33, 'triangle', 0.25, 0.12, null, 0.18);
+      }
+
+      playCorrect() {
+        this.playTone(523.25, 'triangle', 0.14, 0.14);
+        this.playTone(659.25, 'triangle', 0.14, 0.14, null, 0.11);
+        this.playTone(783.99, 'triangle', 0.28, 0.16, null, 0.22);
+      }
+
+      playWrong() {
+        this.playTone(190, 'sawtooth', 0.18, 0.12, 140);
+        this.playTone(155, 'sawtooth', 0.25, 0.12, 110, 0.15);
+      }
+
+      playFreeze() {
+        this.playTone(1200, 'sine', 0.45, 0.15, 320);
+        this.playTone(1650, 'triangle', 0.5, 0.12, 480, 0.05);
+        this.playTone(880, 'sine', 0.6, 0.1, 220, 0.1);
+      }
+
+      playSkeletonAttack() {
+        this.playTone(260, 'sawtooth', 0.14, 0.12, 90);
+      }
+
+      playDeadKnight() {
+        this.playTone(130, 'sawtooth', 0.35, 0.16, 65);
+        this.playTone(98, 'square', 0.4, 0.14, 55, 0.1);
+      }
+
+      playElderLich() {
+        this.playTone(165, 'sawtooth', 0.22, 0.14, 110);
+        this.playTone(146, 'sawtooth', 0.22, 0.14, 98, 0.18);
+        this.playTone(130, 'sawtooth', 0.35, 0.15, 82, 0.36);
+      }
+
+      playSpellCast() {
+        this.playTone(420, 'sine', 0.3, 0.11, 780);
+      }
+
+      playFireball() {
+        this.playTone(300, 'sawtooth', 0.24, 0.12, 75);
+      }
+
+      playPlayerHurt() {
+        this.playTone(220, 'sawtooth', 0.25, 0.16, 70);
+      }
+
+      playImmunity() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+          this.playTone(f, 'sine', 0.25, 0.12, null, idx * 0.08);
+        });
+      }
+
+      playVictory() {
+        this.stopBGM();
+        const fanfare = [523.25, 523.25, 523.25, 659.25, 783.99, 659.25, 1046.5];
+        const times = [0, 0.14, 0.28, 0.42, 0.62, 0.82, 1.0];
+        fanfare.forEach((f, i) => {
+          this.playTone(f, 'triangle', 0.35, 0.15, null, times[i]);
+        });
+      }
+
+      playGameOver() {
+        this.stopBGM();
+        const sad = [293.66, 277.18, 261.63, 246.94, 220.0];
+        sad.forEach((f, i) => {
+          this.playTone(f, 'sawtooth', 0.38, 0.12, f * 0.92, i * 0.28);
+        });
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 2. TIMER SYSTEM (Continuous MM:SS across levels & quizzes)
+     * ============================================================================
+     */
+    class TimerSystem {
+      constructor() {
+        this.elapsedSeconds = 0;
+        this.running = false;
+      }
+
+      reset() {
+        this.elapsedSeconds = 0;
+        this.running = false;
+      }
+
+      start() {
+        this.running = true;
+      }
+
+      stop() {
+        this.running = false;
+      }
+
+      update(dt) {
+        if (this.running) {
+          this.elapsedSeconds += dt;
+        }
+      }
+
+      getFormatted() {
+        const total = Math.floor(this.elapsedSeconds);
+        const mins = String(Math.floor(total / 60)).padStart(2, '0');
+        const secs = String(total % 60).padStart(2, '0');
+        return `${mins}:${secs}`;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 3. HEALTH SYSTEM (3 Lives, 2s I-Frames, 8s Divine Immunity)
+     * ============================================================================
+     */
+    class HealthSystem {
+      constructor(maxLives = 3) {
+        this.maxLives = maxLives;
+        this.lives = maxLives;
+        this.iFrameTimer = 0;       // 2s post-hit invulnerability
+        this.immunityTimer = 0;     // 8s Divine Immunity from Cursed Chest
+        this.damageFlashTimer = 0;
+      }
+
+      reset() {
+        this.lives = this.maxLives;
+        this.iFrameTimer = 0;
+        this.immunityTimer = 0;
+        this.damageFlashTimer = 0;
+      }
+
+      grantDivineImmunity(duration = 8.0) {
+        this.immunityTimer = duration;
+      }
+
+      isInvulnerable() {
+        return this.immunityTimer > 0 || this.iFrameTimer > 0;
+      }
+
+      hasDivineImmunity() {
+        return this.immunityTimer > 0;
+      }
+
+      update(dt) {
+        if (this.iFrameTimer > 0) this.iFrameTimer = Math.max(0, this.iFrameTimer - dt);
+        if (this.immunityTimer > 0) this.immunityTimer = Math.max(0, this.immunityTimer - dt);
+        if (this.damageFlashTimer > 0) this.damageFlashTimer = Math.max(0, this.damageFlashTimer - dt);
+      }
+
+      takeDamage(audio) {
+        if (this.isInvulnerable() || this.lives <= 0) return false;
+        this.lives = Math.max(0, this.lives - 1);
+        this.iFrameTimer = 2.0;
+        this.damageFlashTimer = 0.45;
+        if (audio) audio.playPlayerHurt();
+        return true;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 4. ABILITY SYSTEM (Ancient Freeze & Milestone Rewards)
+     * ============================================================================
+     */
+    class AbilitySystem {
+      constructor() {
+        this.stock = 0;
+        this.earnedTotal = 0;
+        this.usedTotal = 0;
+        this.waveAnimations = []; // Expanding ice shockwave rings
+      }
+
+      reset() {
+        this.stock = 0;
+        this.earnedTotal = 0;
+        this.usedTotal = 0;
+        this.waveAnimations = [];
+      }
+
+      /**
+       * Milestone rule:
+       * 0 correct -> 0
+       * 1 correct -> 0
+       * 2 correct -> 1st ability
+       * 3 correct -> 2nd ability (+1)
+       * N correct (N >= 2) -> total earned = N - 1
+       */
+      checkMilestone(correctCount) {
+        if (correctCount >= 2) {
+          const targetEarned = correctCount - 1;
+          if (targetEarned > this.earnedTotal) {
+            const diff = targetEarned - this.earnedTotal;
+            this.earnedTotal += diff;
+            this.stock += diff;
+            return true;
+          }
+        }
+        return false;
+      }
+
+      activate(player, enemies, boss, audio) {
+        if (this.stock <= 0) return false;
+        this.stock--;
+        this.usedTotal++;
+
+        if (audio) audio.playFreeze();
+
+        // Create expanding ice wave centered on player
+        this.waveAnimations.push({
+          x: player.x,
+          y: player.y,
+          radius: 16,
+          maxRadius: 340,
+          alpha: 1.0
+        });
+
+        const freezeRadius = 340;
+        let hitCount = 0;
+
+        // Stun Skeletons & Dead Knights for 5 seconds
+        enemies.forEach(enemy => {
+          const dist = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+          if (dist <= freezeRadius) {
+            enemy.applyStun(5.0);
+            hitCount++;
+          }
+        });
+
+        // Stun Elder Lich for 3 seconds
+        if (boss) {
+          const distBoss = Math.hypot(boss.x - player.x, boss.y - player.y);
+          if (distBoss <= freezeRadius + 40) {
+            boss.applyStun(3.0);
+            hitCount++;
+          }
+        }
+
+        return { activated: true, hitCount };
+      }
+
+      update(dt) {
+        for (let i = this.waveAnimations.length - 1; i >= 0; i--) {
+          const w = this.waveAnimations[i];
+          w.radius += 680 * dt;
+          w.alpha = Math.max(0, 1 - w.radius / w.maxRadius);
+          if (w.radius >= w.maxRadius) {
+            this.waveAnimations.splice(i, 1);
+          }
+        }
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 5. GACHA SYSTEM (Cursed Chest: 60% Divine Immunity, 40% Dead Knight Summon)
+     * ============================================================================
+     */
+    class GachaSystem {
+      roll() {
+        const rand = Math.random(); // True random [0, 1)
+        if (rand < 0.60) {
+          return {
+            type: 'IMMUNITY',
+            title: '✨ DIVINE IMMUNITY (60%)',
+            description: 'Cahaya suci menyelimutimu! Kamu kebal dari semua serangan monster selama 8 detik!',
+            icon: '🛡️'
+          };
+        } else {
+          return {
+            type: 'DEAD_KNIGHT',
+            title: '💀 DEAD KNIGHT SUMMONED (40%)',
+            description: 'Kutukan bangkit! Sesosok Dead Knight berzirah hitam muncul dan langsung memburumu!',
+            icon: '⚔️'
+          };
+        }
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 6. QUIZ SYSTEM (Randomized selection, Shuffled options, Safe validation)
+     * ============================================================================
+     */
+    class QuizSystem {
+      constructor(bank) {
+        this.bank = bank;
+        this.usedIds = new Set();
+        this.correctCount = 0;
+      }
+
+      reset() {
+        this.usedIds.clear();
+        this.correctCount = 0;
+      }
+
+      pickQuestionsForLevel(levelNumber) {
+        // Level 1: 2 Easy, 2 Medium, 1 Hard
+        // Level 2: 1 Medium, 1 Hard
+        const blueprint = levelNumber === 1
+          ? ['EASY', 'EASY', 'MEDIUM', 'MEDIUM', 'HARD']
+          : ['MEDIUM', 'HARD'];
+
+        const selected = [];
+        for (const diff of blueprint) {
+          let pool = this.bank.filter(q => q.difficulty === diff && !this.usedIds.has(q.id));
+          if (pool.length === 0) {
+            pool = this.bank.filter(q => q.difficulty === diff);
+          }
+          const chosen = pool[Math.floor(Math.random() * pool.length)];
+          this.usedIds.add(chosen.id);
+          selected.push(this.prepareQuestion(chosen));
+        }
+        return selected;
+      }
+
+      prepareQuestion(rawQ) {
+        // Shuffle options while preserving exact correct answer mapping
+        const indexedOptions = rawQ.options.map((text, idx) => ({
+          text,
+          isCorrect: idx === rawQ.answerIndex
+        }));
+
+        for (let i = indexedOptions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indexedOptions[i], indexedOptions[j]] = [indexedOptions[j], indexedOptions[i]];
+        }
+
+        const correctIndex = indexedOptions.findIndex(o => o.isCorrect);
+
+        return {
+          id: rawQ.id,
+          category: rawQ.category,
+          difficulty: rawQ.difficulty,
+          question: rawQ.question,
+          options: indexedOptions.map(o => o.text),
+          correctIndex,
+          explanation: rawQ.explanation
+        };
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 7. CHEST SYSTEM (Manages Chests, Cursed Chest Marker, Interaction Radius)
+     * ============================================================================
+     */
+    class ChestSystem {
+      constructor() {
+        this.chests = [];
+      }
+
+      spawnChests(spawnPoints, questions, hasCursedChest = false) {
+        this.chests = [];
+        // Shuffle spawn points
+        const shuffledPoints = [...spawnPoints].sort(() => Math.random() - 0.5);
+        const cursedIdx = hasCursedChest ? Math.floor(Math.random() * questions.length) : -1;
+
+        questions.forEach((q, idx) => {
+          const pt = shuffledPoints[idx % shuffledPoints.length];
+          this.chests.push({
+            id: idx + 1,
+            x: pt.x,
+            y: pt.y,
+            questionData: q,
+            isCursed: idx === cursedIdx,
+            openedOnce: false,
+            solved: false,
+            gachaTriggered: false
+          });
+        });
+      }
+
+      getNearbyUnsolvedChest(player, radius = 56) {
+        let nearest = null;
+        let minDist = radius;
+        for (const chest of this.chests) {
+          if (chest.solved) continue;
+          const d = Math.hypot(chest.x - player.x, chest.y - player.y);
+          if (d <= minDist) {
+            minDist = d;
+            nearest = chest;
+          }
+        }
+        return nearest;
+      }
+
+      getSolvedCount() {
+        return this.chests.filter(c => c.solved).length;
+      }
+
+      allSolved() {
+        return this.chests.length > 0 && this.chests.every(c => c.solved);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 8. PLAYER CONTROLLER (Movement, Collision Sliding, Animations)
+     * ============================================================================
+     */
+    class PlayerController {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 15;
+        this.speed = 185;
+        this.vx = 0;
+        this.vy = 0;
+        this.facing = 'down';
+        this.animTimer = 0;
+        this.animFrame = 0;
+        this.castAnimTimer = 0;
+      }
+
+      reset(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+        this.vy = 0;
+        this.castAnimTimer = 0;
+      }
+
+      triggerCastAnim() {
+        this.castAnimTimer = 0.5;
+      }
+
+      update(dt, inputVector, levelMap, audio) {
+        if (this.castAnimTimer > 0) {
+          this.castAnimTimer = Math.max(0, this.castAnimTimer - dt);
+        }
+
+        const len = Math.hypot(inputVector.x, inputVector.y);
+        if (len > 0.05) {
+          const nx = inputVector.x / Math.max(1, len);
+          const ny = inputVector.y / Math.max(1, len);
+          this.vx = nx * this.speed;
+          this.vy = ny * this.speed;
+
+          if (Math.abs(nx) > Math.abs(ny)) {
+            this.facing = nx > 0 ? 'right' : 'left';
+          } else {
+            this.facing = ny > 0 ? 'down' : 'up';
+          }
+
+          this.animTimer += dt * 9;
+          this.animFrame = Math.floor(this.animTimer) % 4;
+          if (audio) audio.playStep();
+        } else {
+          this.vx = 0;
+          this.vy = 0;
+          this.animTimer += dt * 2.5;
+          this.animFrame = Math.floor(this.animTimer) % 2;
+        }
+
+        // Move with smooth wall sliding on X and Y independently
+        const nextX = this.x + this.vx * dt;
+        if (!levelMap.collidesCircle(nextX, this.y, this.radius)) {
+          this.x = nextX;
+        }
+
+        const nextY = this.y + this.vy * dt;
+        if (!levelMap.collidesCircle(this.x, nextY, this.radius)) {
+          this.y = nextY;
+        }
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 9. STEERING & OBSTACLE AVOIDANCE HELPER FOR MONSTERS
+     * Prevents monsters from getting stuck walking straight into walls
+     * ============================================================================
+     */
+    function moveWithObstacleAvoidance(entity, targetX, targetY, speed, dt, levelMap) {
+      const dx = targetX - entity.x;
+      const dy = targetY - entity.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 2) return;
+
+      const baseAngle = Math.atan2(dy, dx);
+      // Sample candidate angles around the direct path to navigate around corners/pillars
+      const offsets = [0, 0.45, -0.45, 0.9, -0.9, 1.35, -1.35, 1.8, -1.8, Math.PI];
+
+      for (const offset of offsets) {
+        const angle = baseAngle + offset;
+        const stepX = Math.cos(angle) * speed * dt;
+        const stepY = Math.sin(angle) * speed * dt;
+
+        // Look slightly ahead to anticipate walls
+        const lookAheadX = entity.x + Math.cos(angle) * (entity.radius + 10);
+        const lookAheadY = entity.y + Math.sin(angle) * (entity.radius + 10);
+
+        if (!levelMap.collidesCircle(entity.x + stepX, entity.y + stepY, entity.radius) &&
+            !levelMap.collidesCircle(lookAheadX, lookAheadY, entity.radius * 0.75)) {
+          entity.x += stepX;
+          entity.y += stepY;
+          entity.facingLeft = Math.cos(angle) < 0;
+          return;
+        }
+      }
+
+      // Fallback single-axis slide
+      const rawVx = Math.cos(baseAngle) * speed * dt;
+      const rawVy = Math.sin(baseAngle) * speed * dt;
+      if (!levelMap.collidesCircle(entity.x + rawVx, entity.y, entity.radius)) entity.x += rawVx;
+      if (!levelMap.collidesCircle(entity.x, entity.y + rawVy, entity.radius)) entity.y += rawVy;
+    }
+
+    /**
+     * ============================================================================
+     * 10. SKELETON AI (Patrol, Detection Radius, Chase, Attack, 5s Stun)
+     * ============================================================================
+     */
+    class SkeletonAI {
+      constructor(x, y, patrolPoints) {
+        this.type = 'SKELETON';
+        this.x = x;
+        this.y = y;
+        this.radius = 15;
+        this.patrolSpeed = 68;
+        this.chaseSpeed = 118;
+        this.detectRadius = 215;
+        this.attackRange = 32;
+        this.attackCooldown = 0;
+        this.attackAnimTimer = 0;
+        this.stunTimer = 0;
+        this.state = 'PATROL';
+        this.patrolPoints = patrolPoints && patrolPoints.length > 0 ? patrolPoints : [{ x: x + 80, y }, { x: x - 80, y }];
+        this.patrolIndex = 0;
+        this.patrolWait = 0;
+        this.animTimer = Math.random() * 5;
+        this.facingLeft = false;
+      }
+
+      applyStun(duration = 5.0) {
+        this.stunTimer = Math.max(this.stunTimer, duration);
+      }
+
+      update(dt, player, levelMap, healthSystem, audio) {
+        this.animTimer += dt * 7;
+
+        if (this.attackCooldown > 0) this.attackCooldown = Math.max(0, this.attackCooldown - dt);
+        if (this.attackAnimTimer > 0) this.attackAnimTimer = Math.max(0, this.attackAnimTimer - dt);
+
+        if (this.stunTimer > 0) {
+          this.stunTimer = Math.max(0, this.stunTimer - dt);
+          this.state = 'STUNNED';
+          return;
+        }
+
+        const distToPlayer = Math.hypot(player.x - this.x, player.y - this.y);
+
+        if (distToPlayer <= this.detectRadius) {
+          this.state = 'CHASE';
+          if (distToPlayer > this.attackRange - 4) {
+            moveWithObstacleAvoidance(this, player.x, player.y, this.chaseSpeed, dt, levelMap);
+          }
+          if (distToPlayer <= this.attackRange && this.attackCooldown <= 0) {
+            this.attackCooldown = 1.35;
+            this.attackAnimTimer = 0.3;
+            if (audio) audio.playSkeletonAttack();
+            healthSystem.takeDamage(audio);
+          }
+        } else {
+          this.state = 'PATROL';
+          if (this.patrolWait > 0) {
+            this.patrolWait -= dt;
+            return;
+          }
+          const wp = this.patrolPoints[this.patrolIndex];
+          const distWp = Math.hypot(wp.x - this.x, wp.y - this.y);
+          if (distWp < 14) {
+            this.patrolIndex = (this.patrolIndex + 1) % this.patrolPoints.length;
+            this.patrolWait = 0.5 + Math.random() * 0.7;
+          } else {
+            moveWithObstacleAvoidance(this, wp.x, wp.y, this.patrolSpeed, dt, levelMap);
+          }
+        }
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 11. DEAD KNIGHT AI (Mini Boss from Cursed Chest: Instant Hunt, Fast, 5s Stun)
+     * ============================================================================
+     */
+    class DeadKnightAI {
+      constructor(x, y) {
+        this.type = 'DEAD_KNIGHT';
+        this.x = x;
+        this.y = y;
+        this.radius = 18;
+        this.chaseSpeed = 148; // Faster & more aggressive than Skeleton
+        this.attackRange = 38;
+        this.attackCooldown = 0;
+        this.attackAnimTimer = 0;
+        this.stunTimer = 0;
+        this.state = 'CHASE';
+        this.animTimer = 0;
+        this.facingLeft = false;
+      }
+
+      applyStun(duration = 5.0) {
+        this.stunTimer = Math.max(this.stunTimer, duration);
+      }
+
+      update(dt, player, levelMap, healthSystem, audio) {
+        this.animTimer += dt * 8.5;
+
+        if (this.attackCooldown > 0) this.attackCooldown = Math.max(0, this.attackCooldown - dt);
+        if (this.attackAnimTimer > 0) this.attackAnimTimer = Math.max(0, this.attackAnimTimer - dt);
+
+        if (this.stunTimer > 0) {
+          this.stunTimer = Math.max(0, this.stunTimer - dt);
+          this.state = 'STUNNED';
+          return;
+        }
+
+        this.state = 'CHASE';
+        const dist = Math.hypot(player.x - this.x, player.y - this.y);
+        if (dist > this.attackRange - 6) {
+          moveWithObstacleAvoidance(this, player.x, player.y, this.chaseSpeed, dt, levelMap);
+        }
+
+        if (dist <= this.attackRange && this.attackCooldown <= 0) {
+          this.attackCooldown = 1.15;
+          this.attackAnimTimer = 0.35;
+          if (audio) audio.playDeadKnight();
+          healthSystem.takeDamage(audio);
+        }
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 12. ELDER LICH AI (Level 2 Final Boss: Hunt Mode, Spell Cast, Fireballs, 3s Stun)
+     * ============================================================================
+     */
+    class ElderLichAI {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 24;
+        this.huntSpeed = 112;
+        this.stunTimer = 0;
+        this.mode = 'HUNT'; // 'HUNT' | 'CASTING' | 'STUNNED'
+        this.castTimer = 0;
+        this.spellCooldown = 2.6;
+        this.spellType = 'SINGLE_FIREBALL'; // 'SINGLE_FIREBALL' | 'SPREAD_FIREBALL' | 'MAGIC_CIRCLE'
+        this.targetLock = { x, y };
+        this.fireballs = [];
+        this.magicCircles = [];
+        this.floatTimer = 0;
+        this.facingLeft = false;
+      }
+
+      applyStun(duration = 3.0) {
+        this.stunTimer = Math.max(this.stunTimer, duration);
+        this.mode = 'STUNNED';
+        this.castTimer = 0;
+      }
+
+      update(dt, player, levelMap, healthSystem, audio, particles) {
+        this.floatTimer += dt * 4;
+
+        // Update active fireballs even if boss gets stunned mid-flight
+        for (let i = this.fireballs.length - 1; i >= 0; i--) {
+          const fb = this.fireballs[i];
+          fb.x += fb.vx * dt;
+          fb.y += fb.vy * dt;
+          fb.life -= dt;
+
+          // Trail particles
+          if (Math.random() < 0.6) {
+            particles.push({
+              x: fb.x,
+              y: fb.y,
+              vx: (Math.random() - 0.5) * 30,
+              vy: (Math.random() - 0.5) * 30,
+              size: 4,
+              color: '#f97316',
+              life: 0.25,
+              maxLife: 0.25
+            });
+          }
+
+          // Hit wall -> explode
+          if (levelMap.collidesCircle(fb.x, fb.y, fb.radius)) {
+            this.spawnExplosion(fb.x, fb.y, particles, audio);
+            this.fireballs.splice(i, 1);
+            continue;
+          }
+
+          // Hit player -> -1 life
+          if (Math.hypot(fb.x - player.x, fb.y - player.y) <= fb.radius + player.radius - 2) {
+            this.spawnExplosion(fb.x, fb.y, particles, audio);
+            healthSystem.takeDamage(audio);
+            this.fireballs.splice(i, 1);
+            continue;
+          }
+
+          if (fb.life <= 0) {
+            this.fireballs.splice(i, 1);
+          }
+        }
+
+        // Update telegraphed dark magic AoE circles
+        for (let i = this.magicCircles.length - 1; i >= 0; i--) {
+          const mc = this.magicCircles[i];
+          mc.timer -= dt;
+          if (mc.timer <= 0 && !mc.erupted) {
+            mc.erupted = true;
+            mc.eruptVisualTimer = 0.4;
+            if (audio) audio.playFireball();
+            // Check player inside AoE circle
+            if (Math.hypot(player.x - mc.x, player.y - mc.y) <= mc.radius) {
+              healthSystem.takeDamage(audio);
+            }
+            for (let p = 0; p < 18; p++) {
+              const a = (Math.PI * 2 * p) / 18;
+              particles.push({
+                x: mc.x,
+                y: mc.y,
+                vx: Math.cos(a) * 110,
+                vy: Math.sin(a) * 110,
+                size: 5,
+                color: '#a855f7',
+                life: 0.45,
+                maxLife: 0.45
+              });
+            }
+          }
+          if (mc.erupted) {
+            mc.eruptVisualTimer -= dt;
+            if (mc.eruptVisualTimer <= 0) {
+              this.magicCircles.splice(i, 1);
+            }
+          }
+        }
+
+        // Boss Stun Check (3 seconds)
+        if (this.stunTimer > 0) {
+          this.stunTimer = Math.max(0, this.stunTimer - dt);
+          this.mode = 'STUNNED';
+          return;
+        }
+
+        // Spell Cast State
+        if (this.mode === 'CASTING') {
+          this.castTimer -= dt;
+          this.facingLeft = player.x < this.x;
+          if (this.castTimer <= 0) {
+            this.releaseSpell(player, audio);
+            this.mode = 'HUNT';
+            this.spellCooldown = 2.7;
+          }
+          return;
+        }
+
+        // Hunt Mode
+        this.mode = 'HUNT';
+        this.spellCooldown -= dt;
+        const dist = Math.hypot(player.x - this.x, player.y - this.y);
+
+        // Keep slight tactical distance while pursuing from multiple angles
+        if (dist > 95) {
+          const flankAngle = Math.sin(this.floatTimer * 0.6) * 0.35;
+          const baseA = Math.atan2(player.y - this.y, player.x - this.x) + flankAngle;
+          const desiredX = this.x + Math.cos(baseA) * 80;
+          const desiredY = this.y + Math.sin(baseA) * 80;
+          moveWithObstacleAvoidance(this, desiredX, desiredY, this.huntSpeed, dt, levelMap);
+        }
+
+        // Touch melee damage if player collides directly with Lich
+        if (dist <= this.radius + player.radius - 4) {
+          healthSystem.takeDamage(audio);
+        }
+
+        // Transition to Spell Cast Mode
+        if (this.spellCooldown <= 0 && dist < 520) {
+          this.mode = 'CASTING';
+          this.castTimer = 0.85; // Telegraph pause before firing
+          this.targetLock = { x: player.x, y: player.y };
+          const roll = Math.random();
+          if (roll < 0.4) {
+            this.spellType = 'SINGLE_FIREBALL';
+          } else if (roll < 0.75) {
+            this.spellType = 'SPREAD_FIREBALL';
+          } else {
+            this.spellType = 'MAGIC_CIRCLE';
+            this.magicCircles.push({
+              x: player.x,
+              y: player.y,
+              radius: 62,
+              timer: 1.05,
+              erupted: false,
+              eruptVisualTimer: 0
+            });
+          }
+          if (audio) audio.playSpellCast();
+        }
+      }
+
+      releaseSpell(player, audio) {
+        const angleToPlayer = Math.atan2(player.y - this.y, player.x - this.x);
+        if (this.spellType === 'SINGLE_FIREBALL') {
+          this.spawnFireball(angleToPlayer, 265);
+          if (audio) audio.playFireball();
+        } else if (this.spellType === 'SPREAD_FIREBALL') {
+          [-0.26, 0, 0.26].forEach(offset => {
+            this.spawnFireball(angleToPlayer + offset, 235);
+          });
+          if (audio) audio.playFireball();
+        }
+      }
+
+      spawnFireball(angle, speed) {
+        this.fireballs.push({
+          x: this.x + Math.cos(angle) * 24,
+          y: this.y + Math.sin(angle) * 24,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: 9,
+          life: 3.2
+        });
+      }
+
+      spawnExplosion(x, y, particles, audio) {
+        if (audio) audio.playFireball();
+        for (let i = 0; i < 12; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const spd = 40 + Math.random() * 90;
+          particles.push({
+            x,
+            y,
+            vx: Math.cos(a) * spd,
+            vy: Math.sin(a) * spd,
+            size: 5,
+            color: i % 2 === 0 ? '#ef4444' : '#fbbf24',
+            life: 0.35,
+            maxLife: 0.35
+          });
+        }
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 13. LEVEL MANAGER (Tilemaps, Wall Collision, Torches, Exit Portal)
+     * ============================================================================
+     */
+    class LevelManager {
+      constructor() {
+        this.tileSize = 48;
+        this.currentLevel = 1;
+        this.cols = 28;
+        this.rows = 20;
+        this.grid = [];
+        this.torches = [];
+        this.exitDoor = { x: 0, y: 0, unlocked: false };
+        this.playerSpawn = { x: 120, y: 120 };
+        this.chestCandidates = [];
+        this.skeletonSpawns = [];
+        this.bossSpawn = null;
+      }
+
+      loadLevel(levelNum) {
+        this.currentLevel = levelNum;
+        if (levelNum === 1) {
+          this.buildLevel1();
+        } else {
+          this.buildLevel2();
+        }
+      }
+
+      buildLevel1() {
+        // 28x20 Cursed Castle & Dark Forest Ruins
+        const layout = [
+          "############################",
+          "#P.....#.........#.........#",
+          "#......#.........#.........#",
+          "#..##..#...###...#...###...#",
+          "#..##......#.........#.....#",
+          "#..........#.........#.....#",
+          "####..######...###...###..##",
+          "#..............#...........#",
+          "#..............#...........#",
+          "#...####.......#.......###.#",
+          "#...#..................#...#",
+          "#...#......#######.....#...#",
+          "#..........#.....#.........#",
+          "#..###.....#.....#.....###.#",
+          "#....#.................#...#",
+          "#....#.....###.###.....#...#",
+          "#..........#.....#.........#",
+          "#..###.....#.....#.....###E#",
+          "#..........................#",
+          "############################"
+        ];
+        this.parseLayout(layout);
+
+        this.chestCandidates = [
+          { x: 10 * 48 + 24, y: 2 * 48 + 24 },
+          { x: 24 * 48 + 24, y: 2 * 48 + 24 },
+          { x: 2 * 48 + 24,  y: 11 * 48 + 24 },
+          { x: 14 * 48 + 24, y: 13 * 48 + 24 },
+          { x: 24 * 48 + 24, y: 10 * 48 + 24 },
+          { x: 6 * 48 + 24,  y: 17 * 48 + 24 },
+          { x: 19 * 48 + 24, y: 7 * 48 + 24 }
+        ];
+
+        this.skeletonSpawns = [
+          {
+            x: 11 * 48 + 24, y: 5 * 48 + 24,
+            patrol: [{ x: 9 * 48 + 24, y: 5 * 48 + 24 }, { x: 15 * 48 + 24, y: 5 * 48 + 24 }]
+          },
+          {
+            x: 21 * 48 + 24, y: 4 * 48 + 24,
+            patrol: [{ x: 20 * 48 + 24, y: 2 * 48 + 24 }, { x: 25 * 48 + 24, y: 5 * 48 + 24 }]
+          },
+          {
+            x: 7 * 48 + 24, y: 10 * 48 + 24,
+            patrol: [{ x: 5 * 48 + 24, y: 8 * 48 + 24 }, { x: 11 * 48 + 24, y: 10 * 48 + 24 }]
+          },
+          {
+            x: 20 * 48 + 24, y: 14 * 48 + 24,
+            patrol: [{ x: 18 * 48 + 24, y: 12 * 48 + 24 }, { x: 23 * 48 + 24, y: 16 * 48 + 24 }]
+          }
+        ];
+        this.bossSpawn = null;
+      }
+
+      buildLevel2() {
+        // 24x18 Elder Lich's Inner Sanctum
+        const layout = [
+          "########################",
+          "#P.....................#",
+          "#......................#",
+          "#...##............##...#",
+          "#...##............##...#",
+          "#......................#",
+          "#.........####.........#",
+          "#.........#..#.........#",
+          "#......................#",
+          "#......................#",
+          "#.........#..#.........#",
+          "#.........####.........#",
+          "#......................#",
+          "#...##............##...#",
+          "#...##............##...#",
+          "#......................#",
+          "#.....................E#",
+          "########################"
+        ];
+        this.parseLayout(layout);
+
+        this.chestCandidates = [
+          { x: 20 * 48 + 24, y: 2 * 48 + 24 },
+          { x: 3 * 48 + 24,  y: 15 * 48 + 24 },
+          { x: 18 * 48 + 24, y: 12 * 48 + 24 },
+          { x: 7 * 48 + 24,  y: 5 * 48 + 24 }
+        ];
+        this.skeletonSpawns = []; // No regular Skeletons in Level 2
+        this.bossSpawn = { x: 14 * 48 + 24, y: 8 * 48 + 24 };
+      }
+
+      parseLayout(layout) {
+        this.rows = layout.length;
+        this.cols = layout[0].length;
+        this.grid = [];
+        this.torches = [];
+
+        for (let r = 0; r < this.rows; r++) {
+          const rowArr = [];
+          for (let c = 0; c < this.cols; c++) {
+            const ch = layout[r][c];
+            const wx = c * this.tileSize + this.tileSize / 2;
+            const wy = r * this.tileSize + this.tileSize / 2;
+
+            if (ch === '#') {
+              rowArr.push(1);
+            } else {
+              rowArr.push(0);
+              if (ch === 'P') {
+                this.playerSpawn = { x: wx, y: wy };
+              } else if (ch === 'E') {
+                this.exitDoor = { x: wx, y: wy, unlocked: false };
+              }
+            }
+          }
+          this.grid.push(rowArr);
+        }
+
+        // Place atmospheric torches along inner walls
+        for (let r = 1; r < this.rows - 1; r++) {
+          for (let c = 1; c < this.cols - 1; c++) {
+            if (this.grid[r][c] === 0 && this.grid[r - 1][c] === 1 && (c + r) % 5 === 0) {
+              this.torches.push({
+                x: c * this.tileSize + this.tileSize / 2,
+                y: r * this.tileSize + 10,
+                phase: Math.random() * Math.PI * 2
+              });
+            }
+          }
+        }
+      }
+
+      collidesCircle(cx, cy, radius) {
+        const minC = Math.floor((cx - radius) / this.tileSize);
+        const maxC = Math.floor((cx + radius) / this.tileSize);
+        const minR = Math.floor((cy - radius) / this.tileSize);
+        const maxR = Math.floor((cy + radius) / this.tileSize);
+
+        for (let r = minR; r <= maxR; r++) {
+          for (let c = minC; c <= maxC; c++) {
+            if (r < 0 || r >= this.rows || c < 0 || c >= this.cols || this.grid[r][c] === 1) {
+              const tileX = c * this.tileSize;
+              const tileY = r * this.tileSize;
+              const closestX = Math.max(tileX, Math.min(cx, tileX + this.tileSize));
+              const closestY = Math.max(tileY, Math.min(cy, tileY + this.tileSize));
+              const dx = cx - closestX;
+              const dy = cy - closestY;
+              if (dx * dx + dy * dy < radius * radius) {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      }
+
+      getRandomDeadKnightSpawn(player) {
+        // Pick a walkable tile at medium distance (150..280px) from player
+        const valid = [];
+        for (let r = 2; r < this.rows - 2; r++) {
+          for (let c = 2; c < this.cols - 2; c++) {
+            if (this.grid[r][c] === 0) {
+              const wx = c * this.tileSize + 24;
+              const wy = r * this.tileSize + 24;
+              const d = Math.hypot(wx - player.x, wy - player.y);
+              if (d >= 150 && d <= 300) {
+                valid.push({ x: wx, y: wy });
+              }
+            }
+          }
+        }
+        if (valid.length > 0) {
+          return valid[Math.floor(Math.random() * valid.length)];
+        }
+        return { x: player.x + 120, y: player.y };
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 14. PIXEL ART SPRITE RENDERER (Crisp Procedural Pixel Characters & Tiles)
+     * ============================================================================
+     */
+    class PixelArtRenderer {
+      static drawPixelMatrix(ctx, matrix, palette, x, y, pixelSize = 3, flipX = false) {
+        const h = matrix.length;
+        const w = matrix[0].length;
+        const startX = x - (w * pixelSize) / 2;
+        const startY = y - (h * pixelSize) / 2;
+
+        for (let r = 0; r < h; r++) {
+          for (let c = 0; c < w; c++) {
+            const code = matrix[r][c];
+            if (code === '.' || !palette[code]) continue;
+            ctx.fillStyle = palette[code];
+            const drawCol = flipX ? (w - 1 - c) : c;
+            ctx.fillRect(
+              Math.round(startX + drawCol * pixelSize),
+              Math.round(startY + r * pixelSize),
+              pixelSize,
+              pixelSize
+            );
+          }
+        }
+      }
+
+      static drawAdventurer(ctx, x, y, frame = 0, flipX = false, scale = 3) {
+        const palette = {
+          H: '#92400e', // Hood/Hair
+          S: '#fed7aa', // Skin
+          E: '#0f172a', // Eyes
+          C: '#1d4ed8', // Tunic blue
+          G: '#fbbf24', // Gold belt/trim
+          B: '#334155'  // Boots
+        };
+        const legShift = frame % 2 === 1;
+        const matrix = [
+          "...HHHH...",
+          "..HHHHHH..",
+          "..HSSSSH..",
+          "..HSESEH..",
+          "...SSSS...",
+          "..CCCCCC..",
+          ".CCCCCCCC.",
+          ".CGGGGGGC.",
+          "..CCCCCC..",
+          legShift ? "..B....B.." : "...B..B...",
+          legShift ? ".BB....BB." : "..BB..BB.."
+        ];
+        this.drawPixelMatrix(ctx, matrix, palette, x, y, scale, flipX);
+      }
+
+      static drawSkeleton(ctx, x, y, frame = 0, flipX = false, scale = 3) {
+        const palette = {
+          W: '#e2e8f0', // Bone white
+          D: '#94a3b8', // Bone shadow
+          R: '#ef4444', // Glowing red eyes
+          S: '#cbd5e1', // Sword blade
+          G: '#b45309'  // Hilt
+        };
+        const step = frame % 2 === 1;
+        const matrix = [
+          "...WWWW...",
+          "..WWWWWW..",
+          "..WRWWRW..",
+          "...WWWW...",
+          "...DDDD..S",
+          "..WWWWWW.S",
+          "..W.WW.W.S",
+          "...WWWW..G",
+          "...W..W...",
+          step ? "..W....W.." : "...W..W...",
+          step ? ".WW....WW." : "..WW..WW.."
+        ];
+        this.drawPixelMatrix(ctx, matrix, palette, x, y, scale, flipX);
+      }
+
+      static drawDeadKnight(ctx, x, y, frame = 0, flipX = false, scale = 3.4) {
+        const palette = {
+          A: '#1e293b', // Black armor
+          M: '#475569', // Armor highlight
+          R: '#f43f5e', // Crimson eye slit
+          P: '#a855f7', // Dark purple plume/aura
+          S: '#e2e8f0', // Greatsword
+          G: '#fbbf24'  // Gold trim
+        };
+        const step = frame % 2 === 1;
+        const matrix = [
+          "....PP....",
+          "...AAAA...",
+          "..AMMMMA..",
+          "..ARRRRA..",
+          "...AAAA..S",
+          ".AAAAAAAA S",
+          ".AMGGGGMAS",
+          ".AAAAAAAA G",
+          "..AAAAAA..",
+          step ? "..A....A.." : "...A..A...",
+          step ? ".AA....AA." : "..AA..AA.."
+        ];
+        this.drawPixelMatrix(ctx, matrix, palette, x, y, scale, flipX);
+      }
+
+      static drawElderLich(ctx, x, y, floatOffset = 0, flipX = false, scale = 3.8) {
+        const palette = {
+          G: '#fbbf24', // Ancient Crown
+          W: '#f1f5f9', // Giant Skull
+          P: '#c084fc', // Glowing Purple Eyes & Orb
+          R: '#3b0764', // Dark Robes
+          D: '#581c87', // Robe Trim
+          T: '#78350f'  // Staff Wood
+        };
+        const matrix = [
+          "...G.G.G...",
+          "...GGGGG...",
+          "..WWWWWWW..",
+          "..WPWWWPW..",
+          "...WWWWW..P",
+          "..RRRRRRR.T",
+          ".RRRRDRRRR T",
+          ".RRRRDRRRR T",
+          "..RRRRRRR.T",
+          "..RRRRRRR..",
+          "...R.R.R..."
+        ];
+        this.drawPixelMatrix(ctx, matrix, palette, x, y + Math.sin(floatOffset) * 4, scale, flipX);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 15. GAME UI CONTROLLER (HUD, Modals, Menu Showcase, Responsive Joystick)
+     * ============================================================================
+     */
+    class GameUI {
+      constructor(engine) {
+        this.engine = engine;
+        this.cacheDOM();
+        this.bindEvents();
+        this.startShowcaseAnimation();
+      }
+
+      cacheDOM() {
+        this.mainMenu = document.getElementById('mainMenu');
+        this.gameContainer = document.getElementById('gameContainer');
+        this.howToPlayModal = document.getElementById('howToPlayModal');
+        this.quizModal = document.getElementById('quizModal');
+        this.quizModalBox = document.getElementById('quizModalBox');
+        this.gachaModal = document.getElementById('gachaModal');
+        this.gameOverScreen = document.getElementById('gameOverScreen');
+        this.victoryScreen = document.getElementById('victoryScreen');
+
+        this.playerNameInput = document.getElementById('playerNameInput');
+        this.btnSoundMenu = document.getElementById('btnSoundToggleMenu');
+        this.btnSoundHud = document.getElementById('btnSoundToggleHud');
+
+        // HUD elements
+        this.hudTimer = document.getElementById('hudTimer');
+        this.hudLevel = document.getElementById('hudLevel');
+        this.hudHearts = document.getElementById('hudHearts');
+        this.hudCorrect = document.getElementById('hudCorrect');
+        this.hudChests = document.getElementById('hudChests');
+        this.hudAbility = document.getElementById('hudAbility');
+        this.hudObjective = document.getElementById('hudObjective');
+        this.hudImmunityBadge = document.getElementById('hudImmunityBadge');
+        this.hudImmunityTime = document.getElementById('hudImmunityTime');
+        this.hudStunBadge = document.getElementById('hudStunBadge');
+        this.hudStunTime = document.getElementById('hudStunTime');
+        this.toastBanner = document.getElementById('toastBanner');
+      }
+
+      bindEvents() {
+        document.getElementById('btnStartAdventure').addEventListener('click', () => {
+          const name = this.playerNameInput.value.trim() || 'Petualang';
+          this.engine.startNewGame(name);
+        });
+
+        document.getElementById('btnHowToPlay').addEventListener('click', () => {
+          this.howToPlayModal.classList.remove('hidden');
+        });
+
+        document.getElementById('btnCloseHowToPlay').addEventListener('click', () => {
+          this.howToPlayModal.classList.add('hidden');
+        });
+
+        const toggleSound = () => {
+          const muted = this.engine.audio.toggleMute();
+          this.btnSoundMenu.textContent = muted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON';
+          this.btnSoundHud.textContent = muted ? '🔇' : '🔊';
+        };
+        this.btnSoundMenu.addEventListener('click', toggleSound);
+        this.btnSoundHud.addEventListener('click', toggleSound);
+
+        document.getElementById('btnCloseQuiz').addEventListener('click', () => {
+          this.closeQuizModal();
+        });
+
+        document.getElementById('btnTryAgain').addEventListener('click', () => {
+          this.engine.startNewGame(this.engine.playerName);
+        });
+
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+          this.engine.startNewGame(this.engine.playerName);
+        });
+
+        const backToMenu = () => {
+          this.engine.returnToMainMenu();
+        };
+        document.getElementById('btnGoMainMenu').addEventListener('click', backToMenu);
+        document.getElementById('btnVicMainMenu').addEventListener('click', backToMenu);
+
+        // Touch action buttons
+        document.getElementById('btnTouchInteract').addEventListener('click', () => {
+          document.body.classList.remove('desktop-mode');
+          this.engine.handleInteract();
+        });
+
+        document.getElementById('btnTouchAbility').addEventListener('click', () => {
+          document.body.classList.remove('desktop-mode');
+          this.engine.handleUseAbility();
+        });
+
+        // Virtual Joystick
+        this.setupJoystick();
+      }
+
+      setupJoystick() {
+        const zone = document.getElementById('joystickZone');
+        const knob = document.getElementById('joystickKnob');
+        let activeTouchId = null;
+        const maxDist = 38;
+
+        const updateStick = (clientX, clientY) => {
+          const rect = zone.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          let dx = clientX - centerX;
+          let dy = clientY - centerY;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+          }
+
+          knob.style.transform = `translate(${dx}px, ${dy}px)`;
+          this.engine.touchInput.x = dx / maxDist;
+          this.engine.touchInput.y = dy / maxDist;
+        };
+
+        const resetStick = () => {
+          activeTouchId = null;
+          knob.style.transform = 'translate(0px, 0px)';
+          this.engine.touchInput.x = 0;
+          this.engine.touchInput.y = 0;
+        };
+
+        zone.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          document.body.classList.remove('desktop-mode');
+          const touch = e.changedTouches[0];
+          activeTouchId = touch.identifier;
+          updateStick(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        zone.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            const t = e.changedTouches[i];
+            if (t.identifier === activeTouchId) {
+              updateStick(t.clientX, t.clientY);
+              break;
+            }
+          }
+        }, { passive: false });
+
+        zone.addEventListener('touchend', (e) => {
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === activeTouchId) {
+              resetStick();
+              break;
+            }
+          }
+        });
+
+        zone.addEventListener('touchcancel', resetStick);
+      }
+
+      startShowcaseAnimation() {
+        const canvas = document.getElementById('showcaseCanvas');
+        const ctx = canvas.getContext('2d');
+        let t = 0;
+        const loop = () => {
+          t += 0.06;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Floor line
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(0, 86, canvas.width, 24);
+
+          const frame = Math.floor(t * 2) % 4;
+          PixelArtRenderer.drawAdventurer(ctx, 70, 66, frame, false, 3.2);
+          PixelArtRenderer.drawSkeleton(ctx, 175, 66, frame, true, 3.2);
+          PixelArtRenderer.drawDeadKnight(ctx, 275, 64, frame, true, 3.6);
+          PixelArtRenderer.drawElderLich(ctx, 375, 58, t, true, 4.0);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = 'bold 10px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('ADVENTURER', 70, 102);
+          ctx.fillText('SKELETON', 175, 102);
+          ctx.fillText('DEAD KNIGHT', 275, 102);
+          ctx.fillText('ELDER LICH', 375, 102);
+
+          requestAnimationFrame(loop);
+        };
+        loop();
+      }
+
+      showToast(message, duration = 2600) {
+        this.toastBanner.textContent = message;
+        this.toastBanner.classList.remove('hidden');
+        clearTimeout(this.toastTimeout);
+        this.toastTimeout = setTimeout(() => {
+          this.toastBanner.classList.add('hidden');
+        }, duration);
+      }
+
+      updateHUD(state) {
+        this.hudTimer.textContent = state.timerFormatted;
+        this.hudLevel.textContent = `LEVEL ${state.level}`;
+        this.hudCorrect.textContent = state.correctCount;
+        this.hudChests.textContent = `${state.chestsSolved}/${state.chestsTotal}`;
+        this.hudAbility.textContent = state.abilityStock;
+
+        // Hearts rendering
+        let heartsHtml = '';
+        for (let i = 0; i < state.maxLives; i++) {
+          const lost = i >= state.lives ? 'heart-lost' : '';
+          const dmg = state.damageFlash > 0 && i === state.lives ? 'heart-damage' : '';
+          heartsHtml += `<span class="${lost} ${dmg}">❤️</span>`;
+        }
+        this.hudHearts.innerHTML = heartsHtml;
+
+        // Objective text
+        if (state.exitUnlocked) {
+          this.hudObjective.textContent = state.level === 1
+            ? '🚪 Pintu Level 2 Terbuka! Segera Menuju Pintu Keluar!'
+            : '🏆 Gerbang Akhir Terbuka! Capai EXIT untuk Mematahkan Kutukan!';
+          this.hudObjective.style.borderColor = '#fbbf24';
+          this.hudObjective.style.color = '#fde68a';
+        } else {
+          const rem = state.chestsTotal - state.chestsSolved;
+          this.hudObjective.textContent = state.level === 1
+            ? `🎯 Selesaikan ${rem} Peti Pertanyaan Lagi!`
+            : `🔥 Bertahan & Selesaikan ${rem} Peti di Domain Elder Lich!`;
+          this.hudObjective.style.borderColor = '#10b981';
+          this.hudObjective.style.color = '#6ee7b7';
+        }
+
+        // Divine Immunity Badge
+        if (state.immunityTime > 0) {
+          this.hudImmunityBadge.classList.remove('hidden');
+          this.hudImmunityTime.textContent = state.immunityTime.toFixed(1);
+        } else {
+          this.hudImmunityBadge.classList.add('hidden');
+        }
+
+        // Monster Stun Badge
+        if (state.maxStunTime > 0) {
+          this.hudStunBadge.classList.remove('hidden');
+          this.hudStunTime.textContent = state.maxStunTime.toFixed(1);
+        } else {
+          this.hudStunBadge.classList.add('hidden');
+        }
+      }
+
+      openQuizModal(chest, onSolvedCallback) {
+        const q = chest.questionData;
+        chest.openedOnce = true;
+
+        document.getElementById('quizCategory').textContent = q.category;
+        const diffEl = document.getElementById('quizDifficulty');
+        diffEl.textContent = q.difficulty;
+        diffEl.className = `tag tag-${q.difficulty}`;
+
+        document.getElementById('quizQuestionText').textContent = q.question;
+
+        const optionsList = document.getElementById('quizOptionsList');
+        const feedbackBox = document.getElementById('quizFeedbackBox');
+        const btnContinue = document.getElementById('btnQuizContinue');
+
+        optionsList.innerHTML = '';
+        feedbackBox.classList.add('hidden');
+        btnContinue.classList.add('hidden');
+
+        const letters = ['A', 'B', 'C', 'D'];
+        q.options.forEach((optText, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerHTML = `<span class="option-letter">${letters[idx]}.</span><span>${optText}</span>`;
+
+          btn.addEventListener('click', () => {
+            if (idx === q.correctIndex) {
+              // CORRECT ANSWER
+              this.engine.audio.playCorrect();
+              btn.classList.add('correct');
+              Array.from(optionsList.children).forEach(b => (b.disabled = true));
+
+              feedbackBox.className = 'feedback-box feedback-correct';
+              feedbackBox.innerHTML = `<strong>✅ CORRECT ANSWER!</strong><br>${q.explanation}`;
+              feedbackBox.classList.remove('hidden');
+
+              chest.solved = true;
+              btnContinue.classList.remove('hidden');
+              btnContinue.onclick = () => {
+                this.closeQuizModal();
+                onSolvedCallback(chest);
+              };
+            } else {
+              // WRONG ANSWER - DO NOT REVEAL KEY OR EXPLANATION
+              this.engine.audio.playWrong();
+              btn.classList.add('wrong');
+              btn.disabled = true;
+
+              this.quizModalBox.classList.remove('shake');
+              void this.quizModalBox.offsetWidth;
+              this.quizModalBox.classList.add('shake');
+
+              feedbackBox.className = 'feedback-box feedback-wrong';
+              feedbackBox.innerHTML = `<strong>❌ WRONG ANSWER!</strong><br>Jawaban kurang tepat. Analisis kembali soal dan pilih jawaban lain!`;
+              feedbackBox.classList.remove('hidden');
+            }
+          });
+
+          optionsList.appendChild(btn);
+        });
+
+        this.quizModal.classList.remove('hidden');
+      }
+
+      closeQuizModal() {
+        this.quizModal.classList.add('hidden');
+      }
+
+      isAnyModalOpen() {
+        return !this.quizModal.classList.contains('hidden') ||
+               !this.gachaModal.classList.contains('hidden') ||
+               !this.howToPlayModal.classList.contains('hidden');
+      }
+
+      showGachaSequence(gachaResult, onComplete) {
+        const iconEl = document.getElementById('gachaIcon');
+        const statusEl = document.getElementById('gachaStatusText');
+        const btnConfirm = document.getElementById('btnGachaConfirm');
+
+        iconEl.textContent = '🧰';
+        iconEl.style.animation = 'chestBounce 0.35s infinite alternate';
+        statusEl.innerHTML = 'Memecahkan segel <strong>CURSED CHEST</strong>...';
+        btnConfirm.classList.add('hidden');
+        this.gachaModal.classList.remove('hidden');
+
+        setTimeout(() => {
+          iconEl.textContent = gachaResult.icon;
+          iconEl.style.animation = 'none';
+          statusEl.innerHTML = `<strong style="color:#fbbf24; font-size:1.05rem;">${gachaResult.title}</strong><br><br>${gachaResult.description}`;
+          btnConfirm.classList.remove('hidden');
+          btnConfirm.onclick = () => {
+            this.gachaModal.classList.add('hidden');
+            onComplete(gachaResult);
+          };
+        }, 1250);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 16. MAIN GAME ENGINE (Orchestrates Loop, Physics, Rendering, State)
+     * ============================================================================
+     */
+    class GameEngine {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        this.audio = new AudioManager();
+        this.timer = new TimerSystem();
+        this.health = new HealthSystem(3);
+        this.ability = new AbilitySystem();
+        this.gacha = new GachaSystem();
+        this.quiz = new QuizSystem(QUESTION_BANK);
+        this.chests = new ChestSystem();
+        this.levelManager = new LevelManager();
+        this.player = new PlayerController(120, 120);
+
+        this.enemies = [];
+        this.boss = null;
+        this.particles = [];
+
+        this.playerName = 'Petualang';
+        this.gameState = 'MENU'; // 'MENU' | 'PLAYING' | 'GAMEOVER' | 'VICTORY'
+        this.lastFrameTime = 0;
+
+        this.keys = {};
+        this.touchInput = { x: 0, y: 0 };
+
+        this.ui = new GameUI(this);
+        this.bindKeyboardAndResize();
+        this.resizeCanvas();
+
+        requestAnimationFrame((ts) => this.gameLoop(ts));
+      }
+
+      bindKeyboardAndResize() {
+        window.addEventListener('resize', () => this.resizeCanvas());
+
+        window.addEventListener('keydown', (e) => {
+          this.keys[e.code] = true;
+          if (this.gameState !== 'PLAYING') return;
+
+          if (e.code === 'Escape' && !this.ui.quizModal.classList.contains('hidden')) {
+            this.ui.closeQuizModal();
+            return;
+          }
+
+          if (!this.ui.isAnyModalOpen()) {
+            if (e.code === 'KeyE') {
+              e.preventDefault();
+              this.handleInteract();
+            } else if (e.code === 'Space') {
+              e.preventDefault();
+              this.handleUseAbility();
+            }
+          }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          this.keys[e.code] = false;
+        });
+      }
+
+      resizeCanvas() {
+        const wrapper = document.getElementById('canvasWrapper');
+        if (!wrapper) return;
+        this.canvas.width = wrapper.clientWidth || window.innerWidth;
+        this.canvas.height = wrapper.clientHeight || (window.innerHeight - 54);
+      }
+
+      startNewGame(playerName) {
+        this.playerName = playerName || 'Petualang';
+        this.audio.init();
+        this.audio.startBGM();
+
+        this.timer.reset();
+        this.timer.start();
+        this.health.reset();
+        this.ability.reset();
+        this.quiz.reset();
+        this.particles = [];
+
+        this.ui.mainMenu.classList.add('hidden');
+        this.ui.gameOverScreen.classList.add('hidden');
+        this.ui.victoryScreen.classList.add('hidden');
+        this.ui.quizModal.classList.add('hidden');
+        this.ui.gachaModal.classList.add('hidden');
+        this.ui.gameContainer.classList.remove('hidden');
+
+        this.resizeCanvas();
+        this.setupLevel(1);
+        this.gameState = 'PLAYING';
+      }
+
+      returnToMainMenu() {
+        this.gameState = 'MENU';
+        this.timer.stop();
+        this.audio.stopBGM();
+        this.ui.gameContainer.classList.add('hidden');
+        this.ui.gameOverScreen.classList.add('hidden');
+        this.ui.victoryScreen.classList.add('hidden');
+        this.ui.mainMenu.classList.remove('hidden');
+      }
+
+      setupLevel(levelNum) {
+        this.levelManager.loadLevel(levelNum);
+        this.player.reset(this.levelManager.playerSpawn.x, this.levelManager.playerSpawn.y);
+        this.enemies = [];
+        this.boss = null;
+        this.particles = [];
+
+        const levelQuestions = this.quiz.pickQuestionsForLevel(levelNum);
+        this.chests.spawnChests(
+          this.levelManager.chestCandidates,
+          levelQuestions,
+          levelNum === 1 // Cursed chest active in Level 1
+        );
+
+        if (levelNum === 1) {
+          this.levelManager.skeletonSpawns.forEach(sp => {
+            this.enemies.push(new SkeletonAI(sp.x, sp.y, sp.patrol));
+          });
+          this.ui.showToast('🏰 LEVEL 1: HAUNTED TREASURE — Temukan & Buka 5 Peti!');
+        } else {
+          const bs = this.levelManager.bossSpawn;
+          this.boss = new ElderLichAI(bs.x, bs.y);
+          this.audio.playElderLich();
+          this.ui.showToast("💀 LEVEL 2: ELDER LICH'S DOMAIN — Hindari Sihir & Buka 2 Peti!");
+        }
+      }
+
+      getMovementInput() {
+        if (this.ui.isAnyModalOpen()) {
+          return { x: 0, y: 0 };
+        }
+        let ix = this.touchInput.x;
+        let iy = this.touchInput.y;
+
+        if (this.keys['KeyW'] || this.keys['ArrowUp']) iy -= 1;
+        if (this.keys['KeyS'] || this.keys['ArrowDown']) iy += 1;
+        if (this.keys['KeyA'] || this.keys['ArrowLeft']) ix -= 1;
+        if (this.keys['KeyD'] || this.keys['ArrowRight']) ix += 1;
+
+        return { x: ix, y: iy };
+      }
+
+      handleInteract() {
+        if (this.gameState !== 'PLAYING' || this.ui.isAnyModalOpen()) return;
+
+        const nearbyChest = this.chests.getNearbyUnsolvedChest(this.player, 62);
+        if (nearbyChest) {
+          this.audio.playChestOpen();
+          this.ui.openQuizModal(nearbyChest, (solvedChest) => {
+            this.onChestSolved(solvedChest);
+          });
+          return;
+        }
+
+        // Check if near unlocked exit door
+        const door = this.levelManager.exitDoor;
+        if (door.unlocked && Math.hypot(door.x - this.player.x, door.y - this.player.y) < 64) {
+          this.advanceFromExit();
+        } else {
+          this.ui.showToast('📦 Dekati peti harta karun untuk membukanya!', 1500);
+        }
+      }
+
+      onChestSolved(chest) {
+        this.quiz.correctCount++;
+        const earnedAbility = this.ability.checkMilestone(this.quiz.correctCount);
+
+        if (earnedAbility) {
+          this.ui.showToast(`❄️ MILESTONE! Kamu memperoleh ANCIENT FREEZE! (Stok: ${this.ability.stock})`, 3200);
+        }
+
+        // Sparkles on solved chest
+        for (let i = 0; i < 16; i++) {
+          const a = (Math.PI * 2 * i) / 16;
+          this.particles.push({
+            x: chest.x,
+            y: chest.y,
+            vx: Math.cos(a) * 85,
+            vy: Math.sin(a) * 85,
+            size: 5,
+            color: '#fbbf24',
+            life: 0.6,
+            maxLife: 0.6
+          });
+        }
+
+        // Trigger Cursed Chest Gacha if applicable
+        if (chest.isCursed && !chest.gachaTriggered) {
+          chest.gachaTriggered = true;
+          const result = this.gacha.roll();
+          this.ui.showGachaSequence(result, (res) => {
+            if (res.type === 'IMMUNITY') {
+              this.health.grantDivineImmunity(8.0);
+              this.audio.playImmunity();
+              this.ui.showToast('🛡️ DIVINE IMMUNITY AKTIF! Kebal serangan selama 8 detik!', 3200);
+            } else {
+              const spawnPos = this.levelManager.getRandomDeadKnightSpawn(this.player);
+              this.enemies.push(new DeadKnightAI(spawnPos.x, spawnPos.y));
+              this.audio.playDeadKnight();
+              this.ui.showToast('⚔️ BAHAYA! DEAD KNIGHT MUNCUL MENGEJARMU!', 3200);
+            }
+            this.checkAllChestsComplete();
+          });
+        } else {
+          this.checkAllChestsComplete();
+        }
+      }
+
+      checkAllChestsComplete() {
+        if (this.chests.allSolved() && !this.levelManager.exitDoor.unlocked) {
+          this.levelManager.exitDoor.unlocked = true;
+          this.audio.playImmunity();
+          this.ui.showToast(
+            this.levelManager.currentLevel === 1
+              ? '🚪 SEMUA PETI SELESAI! Pintu menuju Level 2 telah terbuka!'
+              : '🏆 KEDUA PETI SELESAI! Gerbang EXIT terbuka, segera melarikan diri!',
+            3600
+          );
+        }
+      }
+
+      handleUseAbility() {
+        if (this.gameState !== 'PLAYING' || this.ui.isAnyModalOpen()) return;
+        if (this.ability.stock <= 0) {
+          this.ui.showToast('❄️ Stok Ancient Freeze kosong! Jawab soal untuk mendapatkannya.', 1800);
+          return;
+        }
+
+        const res = this.ability.activate(this.player, this.enemies, this.boss, this.audio);
+        if (res && res.activated) {
+          this.player.triggerCastAnim();
+          // Ice crystal particles
+          for (let i = 0; i < 26; i++) {
+            const a = (Math.PI * 2 * i) / 26;
+            const spd = 90 + Math.random() * 140;
+            this.particles.push({
+              x: this.player.x,
+              y: this.player.y,
+              vx: Math.cos(a) * spd,
+              vy: Math.sin(a) * spd,
+              size: 5,
+              color: i % 2 === 0 ? '#38bdf8' : '#e0f2fe',
+              life: 0.65,
+              maxLife: 0.65
+            });
+          }
+          this.ui.showToast(
+            res.hitCount > 0
+              ? `❄️ ANCIENT FREEZE! ${res.hitCount} monster membeku!`
+              : '❄️ ANCIENT FREEZE diaktifkan! (Tidak ada monster dalam jangkauan)',
+            2200
+          );
+        }
+      }
+
+      advanceFromExit() {
+        if (this.levelManager.currentLevel === 1) {
+          this.setupLevel(2);
+        } else {
+          this.triggerVictory();
+        }
+      }
+
+      triggerGameOver() {
+        if (this.gameState === 'GAMEOVER') return;
+        this.gameState = 'GAMEOVER';
+        this.timer.stop();
+        this.ui.closeQuizModal();
+        this.ui.gachaModal.classList.add('hidden');
+        this.audio.playGameOver();
+
+        document.getElementById('goPlayerName').textContent = this.playerName;
+        document.getElementById('goTime').textContent = this.timer.getFormatted();
+        document.getElementById('goCorrect').textContent = this.quiz.correctCount;
+        document.getElementById('goLevel').textContent = `Level ${this.levelManager.currentLevel}`;
+
+        this.ui.gameContainer.classList.add('hidden');
+        this.ui.gameOverScreen.classList.remove('hidden');
+      }
+
+      triggerVictory() {
+        if (this.gameState === 'VICTORY') return;
+        this.gameState = 'VICTORY';
+        this.timer.stop();
+        this.audio.playVictory();
+
+        document.getElementById('vicPlayerName').textContent = this.playerName;
+        document.getElementById('vicTime').textContent = this.timer.getFormatted();
+        document.getElementById('vicCorrect').textContent = this.quiz.correctCount;
+        document.getElementById('vicChests').textContent = '7 / 7';
+        document.getElementById('vicAbilityEarned').textContent = this.ability.earnedTotal;
+        document.getElementById('vicAbilityUsed').textContent = this.ability.usedTotal;
+
+        let hearts = '';
+        for (let i = 0; i < this.health.lives; i++) hearts += '❤️';
+        document.getElementById('vicLives').textContent = hearts || '❤️';
+
+        this.ui.gameContainer.classList.add('hidden');
+        this.ui.victoryScreen.classList.remove('hidden');
+      }
+
+      update(dt) {
+        if (this.gameState !== 'PLAYING') return;
+
+        // Timer runs continuously even during quizzes
+        this.timer.update(dt);
+        this.health.update(dt);
+        this.ability.update(dt);
+
+        // Update Player
+        const inputVec = this.getMovementInput();
+        this.player.update(dt, inputVec, this.levelManager, this.audio);
+
+        // Update Enemies (Keep moving even when Quiz Modal is open, unless Stunned!)
+        let maxStun = 0;
+        for (const enemy of this.enemies) {
+          enemy.update(dt, this.player, this.levelManager, this.health, this.audio);
+          if (enemy.stunTimer > maxStun) maxStun = enemy.stunTimer;
+        }
+
+        // Update Elder Lich Boss in Level 2
+        if (this.boss) {
+          this.boss.update(dt, this.player, this.levelManager, this.health, this.audio, this.particles);
+          if (this.boss.stunTimer > maxStun) maxStun = this.boss.stunTimer;
+        }
+
+        // Update Particles
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt;
+          if (p.life <= 0) this.particles.splice(i, 1);
+        }
+
+        // Check Exit Door collision when unlocked
+        const door = this.levelManager.exitDoor;
+        if (door.unlocked && Math.hypot(door.x - this.player.x, door.y - this.player.y) < 34) {
+          this.advanceFromExit();
+          return;
+        }
+
+        // Check Game Over
+        if (this.health.lives <= 0) {
+          this.triggerGameOver();
+          return;
+        }
+
+        // Refresh HUD
+        this.ui.updateHUD({
+          timerFormatted: this.timer.getFormatted(),
+          level: this.levelManager.currentLevel,
+          lives: this.health.lives,
+          maxLives: this.health.maxLives,
+          damageFlash: this.health.damageFlashTimer,
+          correctCount: this.quiz.correctCount,
+          chestsSolved: this.chests.getSolvedCount(),
+          chestsTotal: this.chests.chests.length,
+          abilityStock: this.ability.stock,
+          exitUnlocked: door.unlocked,
+          immunityTime: this.health.immunityTimer,
+          maxStunTime: maxStun
+        });
+      }
+
+      render() {
+        const ctx = this.ctx;
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+
+        ctx.fillStyle = '#070a14';
+        ctx.fillRect(0, 0, W, H);
+
+        if (this.gameState !== 'PLAYING') return;
+
+        // Camera smoothly centered on Player
+        const mapW = this.levelManager.cols * this.levelManager.tileSize;
+        const mapH = this.levelManager.rows * this.levelManager.tileSize;
+
+        let camX = this.player.x - W / 2;
+        let camY = this.player.y - H / 2;
+
+        if (mapW > W) {
+          camX = Math.max(0, Math.min(camX, mapW - W));
+        } else {
+          camX = (mapW - W) / 2;
+        }
+
+        if (mapH > H) {
+          camY = Math.max(0, Math.min(camY, mapH - H));
+        } else {
+          camY = (mapH - H) / 2;
+        }
+
+        ctx.save();
+        ctx.translate(-Math.round(camX), -Math.round(camY));
+
+        this.renderMap(ctx);
+        this.renderExitDoor(ctx);
+        this.renderChests(ctx);
+        this.renderBossTelegraphs(ctx);
+        this.renderEnemies(ctx);
+        if (this.boss) this.renderBoss(ctx);
+        this.renderPlayer(ctx);
+        this.renderFireballsAndWaves(ctx);
+        this.renderParticles(ctx);
+
+        ctx.restore();
+
+        // Atmospheric Torchlight / Dark Fantasy Vignette
+        this.renderLightingOverlay(ctx, W, H, this.player.x - camX, this.player.y - camY);
+      }
+
+      renderMap(ctx) {
+        const ts = this.levelManager.tileSize;
+        const isLvl1 = this.levelManager.currentLevel === 1;
+
+        for (let r = 0; r < this.levelManager.rows; r++) {
+          for (let c = 0; c < this.levelManager.cols; c++) {
+            const x = c * ts;
+            const y = r * ts;
+            const isWall = this.levelManager.grid[r][c] === 1;
+
+            if (isWall) {
+              // Dark stone castle wall
+              ctx.fillStyle = isLvl1 ? '#1e293b' : '#2e1065';
+              ctx.fillRect(x, y, ts, ts);
+              ctx.fillStyle = isLvl1 ? '#334155' : '#4c1d95';
+              ctx.fillRect(x + 2, y + 2, ts - 4, ts - 10);
+              ctx.strokeStyle = '#0f172a';
+              ctx.lineWidth = 2;
+              ctx.strokeRect(x, y, ts, ts);
+            } else {
+              // Dungeon / Cursed Forest tile floor
+              const checker = (r + c) % 2 === 0;
+              ctx.fillStyle = isLvl1
+                ? (checker ? '#111b27' : '#142326')
+                : (checker ? '#130f26' : '#191333');
+              ctx.fillRect(x, y, ts, ts);
+
+              // Subtle pixel stone detail
+              if ((r * 7 + c * 13) % 5 === 0) {
+                ctx.fillStyle = 'rgba(255,255,255,0.03)';
+                ctx.fillRect(x + 12, y + 14, 8, 6);
+              }
+            }
+          }
+        }
+
+        // Flickering Torches on Walls
+        const now = performance.now() * 0.008;
+        for (const torch of this.levelManager.torches) {
+          const flicker = Math.sin(now + torch.phase) * 3;
+          // Glow
+          const grad = ctx.createRadialGradient(torch.x, torch.y, 2, torch.x, torch.y, 44 + flicker);
+          grad.addColorStop(0, 'rgba(251, 191, 36, 0.35)');
+          grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(torch.x, torch.y, 44 + flicker, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Torch bracket & flame
+          ctx.fillStyle = '#78350f';
+          ctx.fillRect(torch.x - 2, torch.y, 4, 10);
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.arc(torch.x, torch.y - 2, 4 + flicker * 0.25, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      renderExitDoor(ctx) {
+        const door = this.levelManager.exitDoor;
+        const size = 40;
+        const x = door.x - size / 2;
+        const y = door.y - size / 2;
+
+        ctx.fillStyle = door.unlocked ? '#065f46' : '#3f1d2e';
+        ctx.fillRect(x, y, size, size);
+        ctx.strokeStyle = door.unlocked ? '#fbbf24' : '#64748b';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, size, size);
+
+        if (door.unlocked) {
+          const pulse = Math.sin(performance.now() * 0.006) * 5;
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+          ctx.beginPath();
+          ctx.arc(door.x, door.y, 28 + pulse, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(door.unlocked ? 'EXIT' : 'LOCKED', door.x, door.y + 4);
+      }
+
+      renderChests(ctx) {
+        const nearby = this.chests.getNearbyUnsolvedChest(this.player, 62);
+
+        for (const chest of this.chests.chests) {
+          const w = 32;
+          const h = 24;
+          const x = chest.x - w / 2;
+          const y = chest.y - h / 2;
+
+          // Subtle magical shimmer for unsolved chests
+          if (!chest.solved) {
+            const pulse = 18 + Math.sin(performance.now() * 0.005 + chest.id) * 4;
+            const grad = ctx.createRadialGradient(chest.x, chest.y, 4, chest.x, chest.y, pulse);
+            grad.addColorStop(0, 'rgba(251, 191, 36, 0.35)');
+            grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(chest.x, chest.y, pulse, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Chest Body
+          ctx.fillStyle = chest.solved ? '#334155' : '#92400e';
+          ctx.fillRect(x, y, w, h);
+
+          // Chest Lid & Gold Trim
+          ctx.fillStyle = chest.solved ? '#475569' : '#b45309';
+          ctx.fillRect(x, y, w, 9);
+          ctx.strokeStyle = chest.solved ? '#64748b' : '#fbbf24';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x, y, w, h);
+
+          // Lock clasp
+          ctx.fillStyle = chest.solved ? '#10b981' : '#fbbf24';
+          ctx.fillRect(chest.x - 3, y + 6, 6, 6);
+
+          // Interaction prompt when player is close
+          if (nearby && nearby.id === chest.id) {
+            ctx.fillStyle = 'rgba(11, 16, 33, 0.9)';
+            ctx.fillRect(chest.x - 44, y - 24, 88, 18);
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(chest.x - 44, y - 24, 88, 18);
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('[E] BUKA PETI', chest.x, y - 11);
+          }
+        }
+      }
+
+      renderEnemies(ctx) {
+        for (const enemy of this.enemies) {
+          const isStunned = enemy.stunTimer > 0;
+          const frame = Math.floor(enemy.animTimer) % 4;
+
+          if (enemy.type === 'SKELETON') {
+            // Detection ring hint when chasing
+            if (enemy.state === 'CHASE') {
+              ctx.strokeStyle = 'rgba(239, 68, 68, 0.25)';
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.arc(enemy.x, enemy.y, 22, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+            PixelArtRenderer.drawSkeleton(ctx, enemy.x, enemy.y, frame, enemy.facingLeft, 3);
+          } else if (enemy.type === 'DEAD_KNIGHT') {
+            // Dark purple aura
+            const grad = ctx.createRadialGradient(enemy.x, enemy.y, 4, enemy.x, enemy.y, 32);
+            grad.addColorStop(0, 'rgba(168, 85, 247, 0.45)');
+            grad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(enemy.x, enemy.y, 32, 0, Math.PI * 2);
+            ctx.fill();
+
+            PixelArtRenderer.drawDeadKnight(ctx, enemy.x, enemy.y, frame, enemy.facingLeft, 3.5);
+          }
+
+          // Frozen Ice Overlay if Stunned
+          if (isStunned) {
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+            ctx.strokeStyle = '#e0f2fe';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(enemy.x, enemy.y, enemy.radius + 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          }
+        }
+      }
+
+      renderBossTelegraphs(ctx) {
+        if (!this.boss) return;
+        for (const mc of this.boss.magicCircles) {
+          ctx.save();
+          if (!mc.erupted) {
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.18)';
+            ctx.strokeStyle = '#c084fc';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.arc(mc.x, mc.y, mc.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = 'rgba(192, 132, 252, 0.55)';
+            ctx.beginPath();
+            ctx.arc(mc.x, mc.y, mc.radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+      }
+
+      renderBoss(ctx) {
+        const b = this.boss;
+        // Dark boss aura
+        const grad = ctx.createRadialGradient(b.x, b.y, 8, b.x, b.y, 52);
+        grad.addColorStop(0, 'rgba(139, 92, 246, 0.5)');
+        grad.addColorStop(1, 'rgba(76, 29, 149, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 52, 0, Math.PI * 2);
+        ctx.fill();
+
+        PixelArtRenderer.drawElderLich(ctx, b.x, b.y, b.floatTimer, b.facingLeft, 4.2);
+
+        // Glowing staff telegraph when casting
+        if (b.mode === 'CASTING') {
+          ctx.strokeStyle = '#f97316';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, 34, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Stun ice crystal prison
+        if (b.stunTimer > 0) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+          ctx.strokeStyle = '#e0f2fe';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.radius + 10, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        // Boss Nameplate
+        ctx.fillStyle = '#e9d5ff';
+        ctx.font = 'bold 11px Cinzel, serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ELDER LICH', b.x, b.y - 32);
+      }
+
+      renderPlayer(ctx) {
+        const p = this.player;
+
+        // Blink during 2s post-hit i-frames
+        if (this.health.iFrameTimer > 0 && Math.floor(this.health.iFrameTimer * 14) % 2 === 0) {
+          return;
+        }
+
+        // Divine Immunity Golden-Blue Aura (8s)
+        if (this.health.hasDivineImmunity()) {
+          const pulse = 26 + Math.sin(performance.now() * 0.01) * 4;
+          const grad = ctx.createRadialGradient(p.x, p.y, 6, p.x, p.y, pulse);
+          grad.addColorStop(0, 'rgba(251, 191, 36, 0.45)');
+          grad.addColorStop(0.7, 'rgba(56, 189, 248, 0.35)');
+          grad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 22, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Ability Cast Glow
+        if (p.castAnimTimer > 0) {
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 24, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        PixelArtRenderer.drawAdventurer(ctx, p.x, p.y, p.animFrame, p.facing === 'left', 3);
+      }
+
+      renderFireballsAndWaves(ctx) {
+        // Ancient Freeze shockwave rings
+        for (const w of this.ability.waveAnimations) {
+          ctx.strokeStyle = `rgba(56, 189, 248, ${w.alpha})`;
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(w.x, w.y, w.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Elder Lich Fireballs
+        if (this.boss) {
+          for (const fb of this.boss.fireballs) {
+            const grad = ctx.createRadialGradient(fb.x, fb.y, 2, fb.x, fb.y, fb.radius + 6);
+            grad.addColorStop(0, '#fef08a');
+            grad.addColorStop(0.5, '#f97316');
+            grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(fb.x, fb.y, fb.radius + 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      renderParticles(ctx) {
+        for (const p of this.particles) {
+          ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      renderLightingOverlay(ctx, W, H, screenPx, screenPy) {
+        // Dark fantasy atmospheric vignette centered on player's torch vision
+        const radius = Math.max(W, H) * 0.62;
+        const grad = ctx.createRadialGradient(screenPx, screenPy, 90, screenPx, screenPy, radius);
+        grad.addColorStop(0, 'rgba(11, 16, 33, 0)');
+        grad.addColorStop(0.75, 'rgba(11, 16, 33, 0.35)');
+        grad.addColorStop(1, 'rgba(7, 10, 20, 0.78)');
+
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Red flash border when taking damage
+        if (this.health.damageFlashTimer > 0) {
+          ctx.fillStyle = `rgba(239, 68, 68, ${this.health.damageFlashTimer * 0.55})`;
+          ctx.fillRect(0, 0, W, H);
+        }
+      }
+
+      gameLoop(timestamp) {
+        if (!this.lastFrameTime) this.lastFrameTime = timestamp;
+        const dt = Math.min(0.05, (timestamp - this.lastFrameTime) / 1000);
+        this.lastFrameTime = timestamp;
+
+        this.update(dt);
+        this.render();
+
+        requestAnimationFrame((ts) => this.gameLoop(ts));
+      }
+    }
+
+    // Boot Game on Window Load
+    window.onload = () => {
+      window.treasureEscapeGame = new GameEngine();
+    };
+  </script>
+</body>
+</html>
